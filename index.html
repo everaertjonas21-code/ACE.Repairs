@@ -1947,6 +1947,19 @@
     const appointmentDateInput = document.getElementById("apptDate");
     const appointmentNote = document.getElementById("appointmentNote");
     const appointmentSubmitBtn = appointmentForm?.querySelector("button[type=\"submit\"]");
+    const dashboardCacheKey = "ace_dashboard_cache_v1";
+    const formatUiDateTime = (lang, value) => {
+      const d = value instanceof Date ? value : new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value || "");
+      const locale = lang === "fr" ? "fr-BE" : (lang === "en" ? "en-GB" : "nl-BE");
+      return new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(d);
+    };
 
     if (appointmentDateInput && !window.flatpickr) {
       appointmentDateInput.min = new Date().toISOString().split("T")[0];
@@ -1961,7 +1974,7 @@
       const selectedService = data.get("service") || "";
       const selectedDate = data.get("date") || "";
       const selectedDateObj = selectedDate ? new Date(`${selectedDate}T00:00:00`) : null;
-      const submittedAt = new Date().toLocaleString(lang === "en" ? "en-GB" : "nl-BE");
+      const submittedAt = formatUiDateTime(lang, new Date());
       const subject = lang === "en"
         ? `ACE Appointment Request | ${selectedService} | ${selectedDate}`
         : `ACE Afspraakaanvraag | ${selectedService} | ${selectedDate}`;
@@ -2031,12 +2044,16 @@
       };
       try {
         const rawUser = localStorage.getItem("ace_portal_user");
+        const portalToken = localStorage.getItem("ace_portal_token");
         if (rawUser) {
           const user = JSON.parse(rawUser);
           if (user && typeof user === "object") {
             templateParams.customer_user_id = String(user.id || "");
             templateParams.customer_email = String(user.email || "");
           }
+        }
+        if (portalToken) {
+          templateParams.token = String(portalToken || "");
         }
       } catch (_err) {
         // Keep guest booking flow unaffected if local user storage is unavailable.
@@ -2074,6 +2091,23 @@
             appointmentDateInput.min = toIsoDate(getMinAllowedDate());
           }
           if (appointmentNote) appointmentNote.textContent = dict.apptSuccess || "";
+          const portalToken = localStorage.getItem("ace_portal_token") || "";
+          if (portalToken) {
+            fetch(bookingApiUrl, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: "dashboard", token: portalToken })
+            })
+              .then((r) => r.json().catch(() => ({})))
+              .then((dash) => {
+                if (dash && dash.ok) {
+                  localStorage.setItem(dashboardCacheKey, JSON.stringify(dash));
+                }
+              })
+              .catch(() => {
+                // Keep booking successful even if dashboard refresh fails.
+              });
+          }
         })
         .catch((err) => {
           const text = err?.message ? ` ${err.message}` : "";

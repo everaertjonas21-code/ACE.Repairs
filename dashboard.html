@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
@@ -172,7 +172,23 @@
       grid-template-columns: 1.6fr 0.6fr auto;
       gap: 8px;
     }
+    .manager-form-status {
+      display: grid;
+      grid-template-columns: 1.1fr 1.3fr 1fr auto;
+      gap: 8px;
+    }
     .manager-form input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      padding: 10px 11px;
+      font: inherit;
+      min-height: 44px;
+    }
+    .manager-form-status input,
+    .manager-form-status select {
       width: 100%;
       border: 1px solid var(--border);
       border-radius: 9px;
@@ -186,6 +202,16 @@
       border: 0;
       border-radius: 9px;
       background: rgba(225, 25, 25, 0.85);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 10px 12px;
+      min-height: 44px;
+    }
+    .manager-form-status button {
+      border: 0;
+      border-radius: 9px;
+      background: rgba(43, 120, 255, 0.9);
       color: #fff;
       font-weight: 700;
       cursor: pointer;
@@ -207,6 +233,23 @@
       color: #d8ffe9;
       overflow-wrap: anywhere;
     }
+    .voucher-item .voucher-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .voucher-item button {
+      border: 0;
+      border-radius: 8px;
+      background: rgba(225, 25, 25, 0.88);
+      color: #fff;
+      font-weight: 700;
+      padding: 7px 10px;
+      cursor: pointer;
+      min-height: 34px;
+    }
 
     @media (max-width: 920px) {
       .grid { grid-template-columns: 1fr; }
@@ -218,7 +261,13 @@
       .manager-form {
         grid-template-columns: 1fr;
       }
+      .manager-form-status {
+        grid-template-columns: 1fr;
+      }
       .manager-form button {
+        width: 100%;
+      }
+      .manager-form-status button {
         width: 100%;
       }
       .stamps {
@@ -251,6 +300,7 @@
           <button class="lang-btn" data-lang="fr" type="button">FR</button>
         </div>
         <a class="btn" href="index.html" data-i18n="websiteBtn">Website</a>
+        <a class="btn" href="status.html" data-i18n="statusPageBtn">Live Status</a>
         <button class="btn btn-accent" id="logoutBtn" type="button" data-i18n="logoutBtn">Uitloggen</button>
       </div>
     </div>
@@ -272,16 +322,10 @@
           <div class="voucher-list" id="voucherList"></div>
         </section>
 
-        <section class="card">
-          <h2 data-i18n="statusTitle">Actuele Car Status</h2>
-          <p class="muted" id="activeStatusLine">Geen actieve afspraak.</p>
-          <p class="muted" id="activeStatusMeta"></p>
-        </section>
-
-        <section class="card">
-          <h2 data-i18n="loginDetailsTitle">Login Details</h2>
-          <ul class="list" id="loginEventsList">
-            <li class="list-item muted">Nog geen gegevens.</li>
+        <section class="card" style="grid-column: 1 / -1;">
+          <h2 data-i18n="upcomingTitle">Upcoming Appointments</h2>
+          <ul class="list" id="upcomingAppointmentsList">
+            <li class="list-item muted">Laden...</li>
           </ul>
         </section>
 
@@ -300,6 +344,18 @@
               <input type="number" id="grantCount" min="1" max="20" value="1" required />
               <button type="submit" data-i18n="grantBtn">Geef sticker(s)</button>
             </form>
+            <form class="manager-form-status" id="updateStatusForm">
+              <input type="text" id="statusJobId" placeholder="Job ID (appointment id)" />
+              <input type="email" id="statusEmail" placeholder="customer@email.com (optional)" />
+              <select id="statusStage" required>
+                <option value="appointment_confirmed">appointment_confirmed</option>
+                <option value="diagnostic">diagnostic</option>
+                <option value="in_repair">in_repair</option>
+                <option value="quality_check">quality_check</option>
+                <option value="ready_for_pickup">ready_for_pickup</option>
+              </select>
+              <button type="submit" data-i18n="statusUpdateBtn">Update status</button>
+            </form>
             <div class="manager-msg" id="managerMsg"></div>
             <ul class="list" id="managerAccountsList"></ul>
           </div>
@@ -317,30 +373,36 @@
       nl: {
         pageTitle: 'ACE Car Repair | Klantdashboard',
         websiteBtn: 'Website',
+        statusPageBtn: 'Live Status',
         logoutBtn: 'Uitloggen',
         profileTitle: 'Mijn Profiel',
         loyaltyTitle: 'Loyaliteit (Stickers)',
-        statusTitle: 'Actuele Car Status',
-        loginDetailsTitle: 'Login Details',
+        upcomingTitle: 'Komende afspraken',
         appointmentsTitle: 'Mijn Afspraken',
         managerTitle: 'Manager Tools',
         grantBtn: 'Geef sticker(s)',
+        statusUpdateBtn: 'Update status',
         grantOk: 'Sticker(s) toegekend.',
         grantFail: 'Sticker toekennen mislukt.',
+        statusUpdateOk: 'Repair status bijgewerkt.',
+        statusUpdateFail: 'Repair status update mislukt.',
         noAccounts: 'Nog geen accountgegevens.',
         loading: 'Laden...',
         noActive: 'Geen actieve afspraak.',
         noAppointments: 'Nog geen afspraken gevonden.',
-        noLogins: 'Nog geen login events.',
+        noUpcoming: 'Geen komende afspraken.',
         loyaltyLine: '{stamps} sticker(s), {rewards} reward(s) beschikbaar. Elke 5 stickers = 25% korting op je volgende nazicht/check-up.',
         voucherTitle: 'Beschikbare vouchers:',
         voucherEmpty: 'Nog geen voucher actief.',
         voucherText: '{code} - {discount}% korting ({scope})',
+        voucherUseBtn: 'Gebruik',
+        voucherRedeemOk: 'Voucher gebruikt.',
+        voucherRedeemFail: 'Voucher gebruiken mislukt.',
         profileLine: '{name} ({email})',
         lastLogin: 'Laatste login: {value}',
-        currentStatus: 'Huidige status:',
         createdAt: 'Aangemaakt',
         date: 'Datum',
+        jobId: 'Job ID',
         vehicle: 'Voertuig',
         time: 'Tijd',
         language: 'Taal',
@@ -354,30 +416,36 @@
       en: {
         pageTitle: 'ACE Car Repair | Customer Dashboard',
         websiteBtn: 'Website',
+        statusPageBtn: 'Live Status',
         logoutBtn: 'Logout',
         profileTitle: 'My Profile',
         loyaltyTitle: 'Loyalty (Stamps)',
-        statusTitle: 'Current Car Status',
-        loginDetailsTitle: 'Login Details',
+        upcomingTitle: 'Upcoming appointments',
         appointmentsTitle: 'My Appointments',
         managerTitle: 'Manager Tools',
         grantBtn: 'Grant stamp(s)',
+        statusUpdateBtn: 'Update status',
         grantOk: 'Stamp(s) granted.',
         grantFail: 'Grant failed.',
+        statusUpdateOk: 'Repair status updated.',
+        statusUpdateFail: 'Repair status update failed.',
         noAccounts: 'No account records yet.',
         loading: 'Loading...',
         noActive: 'No active appointment.',
         noAppointments: 'No appointments found yet.',
-        noLogins: 'No login events yet.',
+        noUpcoming: 'No upcoming appointments.',
         loyaltyLine: '{stamps} stamp(s), {rewards} reward(s) available. Every 5 stamps = 25% off your next inspection/check-up.',
         voucherTitle: 'Available vouchers:',
         voucherEmpty: 'No active voucher yet.',
         voucherText: '{code} - {discount}% discount ({scope})',
+        voucherUseBtn: 'Use',
+        voucherRedeemOk: 'Voucher used.',
+        voucherRedeemFail: 'Voucher redeem failed.',
         profileLine: '{name} ({email})',
         lastLogin: 'Last login: {value}',
-        currentStatus: 'Current status:',
         createdAt: 'Created',
         date: 'Date',
+        jobId: 'Job ID',
         vehicle: 'Vehicle',
         time: 'Time',
         language: 'Language',
@@ -391,39 +459,45 @@
       fr: {
         pageTitle: 'ACE Car Repair | Tableau Client',
         websiteBtn: 'Site',
-        logoutBtn: 'Se déconnecter',
+        statusPageBtn: 'Live Status',
+        logoutBtn: 'Se dÃ©connecter',
         profileTitle: 'Mon Profil',
-        loyaltyTitle: 'Fidélité (Stickers)',
-        statusTitle: 'Statut Véhicule',
-        loginDetailsTitle: 'Détails de Connexion',
+        loyaltyTitle: 'FidÃ©litÃ© (Stickers)',
+        upcomingTitle: 'Rendez-vous a venir',
         appointmentsTitle: 'Mes Rendez-vous',
         managerTitle: 'Outils Manager',
         grantBtn: 'Donner sticker(s)',
-        grantOk: 'Sticker(s) attribué(s).',
-        grantFail: 'Attribution échouée.',
-        noAccounts: 'Aucun compte enregistré.',
+        statusUpdateBtn: 'Mettre a jour statut',
+        grantOk: 'Sticker(s) attribuÃ©(s).',
+        grantFail: 'Attribution Ã©chouÃ©e.',
+        statusUpdateOk: 'Statut de reparation mis a jour.',
+        statusUpdateFail: 'Echec mise a jour statut.',
+        noAccounts: 'Aucun compte enregistrÃ©.',
         loading: 'Chargement...',
         noActive: 'Aucun rendez-vous actif.',
-        noAppointments: 'Aucun rendez-vous trouvé.',
-        noLogins: 'Aucun événement de connexion.',
-        loyaltyLine: '{stamps} sticker(s), {rewards} récompense(s) disponible(s). Chaque 5 stickers = 25% de réduction sur votre prochain contrôle/check-up.',
+        noAppointments: 'Aucun rendez-vous trouvÃ©.',
+        noUpcoming: 'Aucun rendez-vous a venir.',
+        loyaltyLine: '{stamps} sticker(s), {rewards} rÃ©compense(s) disponible(s). Chaque 5 stickers = 25% de rÃ©duction sur votre prochain contrÃ´le/check-up.',
         voucherTitle: 'Bons disponibles :',
         voucherEmpty: 'Aucun bon actif.',
-        voucherText: '{code} - {discount}% réduction ({scope})',
+        voucherText: '{code} - {discount}% rÃ©duction ({scope})',
+        voucherUseBtn: 'Utiliser',
+        voucherRedeemOk: 'Bon utilisÃ©.',
+        voucherRedeemFail: 'Echec utilisation bon.',
         profileLine: '{name} ({email})',
-        lastLogin: 'Dernière connexion : {value}',
-        currentStatus: 'Statut actuel :',
-        createdAt: 'Créé',
+        lastLogin: 'DerniÃ¨re connexion : {value}',
+        createdAt: 'CrÃ©Ã©',
         date: 'Date',
-        vehicle: 'Véhicule',
+        jobId: 'ID Job',
+        vehicle: 'VÃ©hicule',
         time: 'Heure',
         language: 'Langue',
         timezone: 'Fuseau',
         client: 'Client',
         serviceDefault: 'Service',
         unknownStatus: 'INCONNU',
-        invalidSession: 'Session expirée. Reconnectez-vous.',
-        tempLoadError: 'Erreur temporaire. Réessayez.'
+        invalidSession: 'Session expirÃ©e. Reconnectez-vous.',
+        tempLoadError: 'Erreur temporaire. RÃ©essayez.'
       }
     };
     let currentLang = localStorage.getItem('ace_lang') || 'nl';
@@ -432,20 +506,27 @@
     const lastLoginLine = document.getElementById('lastLoginLine');
     const loyaltyLine = document.getElementById('loyaltyLine');
     const stampGrid = document.getElementById('stampGrid');
-    const activeStatusLine = document.getElementById('activeStatusLine');
-    const activeStatusMeta = document.getElementById('activeStatusMeta');
-    const loginEventsList = document.getElementById('loginEventsList');
     const appointmentsList = document.getElementById('appointmentsList');
+    const upcomingAppointmentsList = document.getElementById('upcomingAppointmentsList');
     const voucherList = document.getElementById('voucherList');
     const logoutBtn = document.getElementById('logoutBtn');
     const managerCard = document.getElementById('managerCard');
     const grantStampForm = document.getElementById('grantStampForm');
     const grantEmail = document.getElementById('grantEmail');
     const grantCount = document.getElementById('grantCount');
+    const updateStatusForm = document.getElementById('updateStatusForm');
+    const statusJobId = document.getElementById('statusJobId');
+    const statusEmail = document.getElementById('statusEmail');
+    const statusStage = document.getElementById('statusStage');
     const managerMsg = document.getElementById('managerMsg');
     const managerAccountsList = document.getElementById('managerAccountsList');
     let lastDashboardData = null;
-    const t = (key) => (translations[currentLang] || translations.nl)[key] || key;
+    const t = (key) => {
+      const langPack = translations[currentLang] || {};
+      if (Object.prototype.hasOwnProperty.call(langPack, key)) return langPack[key];
+      const fallback = translations.nl || {};
+      return fallback[key] || '';
+    };
     const applyLanguage = (lang) => {
       currentLang = translations[lang] ? lang : 'nl';
       localStorage.setItem('ace_lang', currentLang);
@@ -472,7 +553,13 @@
       const d = new Date(value);
       if (Number.isNaN(d.getTime())) return String(value || '-');
       const locale = currentLang === 'fr' ? 'fr-BE' : (currentLang === 'en' ? 'en-GB' : 'nl-BE');
-      return d.toLocaleString(locale);
+      return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(d);
     };
 
     const statusClass = (status) => {
@@ -483,7 +570,6 @@
       if (s === 'DECLINED') return 'declined';
       return '';
     };
-
     const fetchDashboard = async () => {
       const response = await fetch(portalApiUrl, {
         method: 'POST',
@@ -506,6 +592,36 @@
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data?.ok !== true) {
         throw new Error(data?.error || t('grantFail'));
+      }
+      return data;
+    };
+    const updateRepairStatus = async (jobId, email, status) => {
+      const response = await fetch(portalApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'update_repair_status',
+          token,
+          job_id: jobId,
+          customer_email: email,
+          currentStatus: status
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data?.ok !== true) {
+        throw new Error(data?.error || t('statusUpdateFail'));
+      }
+      return data;
+    };
+    const redeemVoucher = async (code) => {
+      const response = await fetch(portalApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'redeem_voucher', token, code })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data?.ok !== true) {
+        throw new Error(data?.error || t('voucherRedeemFail'));
       }
       return data;
     };
@@ -532,24 +648,10 @@
             <strong>${a.service || t('serviceDefault')}</strong>
             <span class="status-pill ${statusClass(a.status)}">${a.status || t('unknownStatus')}</span>
           </div>
+          <div class="line"><span>${t('jobId')}</span><span>${a.id || '-'}</span></div>
           <div class="line"><span>${t('date')}</span><span>${a.preferred_date || '-'}</span></div>
           <div class="line"><span>${t('vehicle')}</span><span>${a.vehicle || '-'}</span></div>
           <div class="line"><span>${t('createdAt')}</span><span>${formatDate(a.created_at)}</span></div>
-        </li>
-      `).join('');
-    };
-
-    const renderLoginEvents = (events) => {
-      if (!Array.isArray(events) || events.length === 0) {
-        loginEventsList.innerHTML = `<li class="list-item muted">${t('noLogins')}</li>`;
-        return;
-      }
-      loginEventsList.innerHTML = events.map((e) => `
-        <li class="list-item">
-          <div class="line"><span>${t('time')}</span><span>${formatDate(e.at)}</span></div>
-          <div class="line"><span>${t('language')}</span><span>${e.language || '-'}</span></div>
-          <div class="line"><span>${t('timezone')}</span><span>${e.timezone || '-'}</span></div>
-          <div class="line"><span>${t('client')}</span><span>${(e.user_agent || '-').slice(0, 42)}</span></div>
         </li>
       `).join('');
     };
@@ -565,9 +667,39 @@
           .replace('{code}', String(v.code || '-'))
           .replace('{discount}', String(v.discount_percent || 25))
           .replace('{scope}', String(v.service_scope || 'inspection'));
-        return `<div class="voucher-item">${text}</div>`;
+        const code = String(v.code || '');
+        return `<div class="voucher-item"><div class="voucher-row"><span>${text}</span><button type="button" class="voucher-use-btn" data-code="${code}">${t('voucherUseBtn')}</button></div></div>`;
       }).join('');
       voucherList.innerHTML = `${title}${body}`;
+      voucherList.querySelectorAll('.voucher-use-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          managerMsg.textContent = t('loading');
+          redeemVoucher(String(btn.dataset.code || ''))
+            .then(() => fetchDashboard())
+            .then((data) => {
+              lastDashboardData = data;
+              localStorage.setItem(dashboardCacheKey, JSON.stringify(data));
+              render(data);
+              managerMsg.textContent = t('voucherRedeemOk');
+            })
+            .catch((err) => {
+              managerMsg.textContent = String(err?.message || t('voucherRedeemFail'));
+            });
+        });
+      });
+    };
+    const renderUpcomingAppointments = (items) => {
+      if (!Array.isArray(items) || items.length === 0) {
+        upcomingAppointmentsList.innerHTML = `<li class="list-item muted">${t('noUpcoming')}</li>`;
+        return;
+      }
+      upcomingAppointmentsList.innerHTML = items.map((a) => `
+        <li class="list-item">
+          <div class="line"><strong>${a.service || t('serviceDefault')}</strong><span>${a.preferred_date || '-'}</span></div>
+          <div class="line"><span>${t('jobId')}</span><span>${a.id || '-'}</span></div>
+          <div class="line"><span>${t('vehicle')}</span><span>${a.vehicle || '-'}</span></div>
+        </li>
+      `).join('');
     };
 
     const renderManagerAccounts = (items) => {
@@ -587,7 +719,6 @@
       const user = data.user || {};
       const loyalty = data.loyalty || {};
       const vouchers = data.vouchers || [];
-      const active = data.active_car_status || null;
       profileLine.textContent = t('profileLine')
         .replace('{name}', user.name || 'Customer')
         .replace('{email}', user.email || '-');
@@ -598,16 +729,8 @@
       renderStamps(loyalty);
       renderVouchers(vouchers);
 
-      if (active) {
-        activeStatusLine.innerHTML = `${t('currentStatus')} <span class="status-pill ${statusClass(active.status)}">${active.status || '-'}</span>`;
-        activeStatusMeta.textContent = `${active.service || '-'} | ${active.vehicle || '-'} | ${t('date')}: ${active.preferred_date || '-'}`;
-      } else {
-        activeStatusLine.textContent = t('noActive');
-        activeStatusMeta.textContent = '';
-      }
-
+      renderUpcomingAppointments(data.upcoming_appointments || []);
       renderAppointments(data.appointments || []);
-      renderLoginEvents(data.login_events || []);
       if (data.user?.role === 'manager') {
         managerCard.style.display = 'block';
         renderManagerAccounts(data.manager_tools?.accounts || []);
@@ -667,6 +790,27 @@
           managerMsg.textContent = String(err?.message || t('grantFail'));
         });
     });
+
+    updateStatusForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      managerMsg.textContent = t('loading');
+      updateRepairStatus(
+        String(statusJobId.value || '').trim(),
+        String(statusEmail.value || '').trim(),
+        String(statusStage.value || '').trim()
+      )
+        .then(() => fetchDashboard())
+        .then((data) => {
+          lastDashboardData = data;
+          localStorage.setItem(dashboardCacheKey, JSON.stringify(data));
+          render(data);
+          managerMsg.textContent = t('statusUpdateOk');
+        })
+        .catch((err) => {
+          managerMsg.textContent = String(err?.message || t('statusUpdateFail'));
+        });
+    });
   </script>
 </body>
 </html>
+
