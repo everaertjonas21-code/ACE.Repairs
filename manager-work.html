@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACE Car Repair | Manager Work</title>
+  <style>
+    :root { --bg:#0f1318; --panel:#171d24; --border:rgba(199,204,211,.22); --text:#f3f6fb; --muted:#a6b0bc; --accent:#e11919; }
+    *{box-sizing:border-box} body{margin:0;font-family:"Montserrat","Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    .container{width:min(1100px,92%);margin-inline:auto} .top{position:sticky;top:0;background:rgba(13,16,20,.92);border-bottom:1px solid var(--border);z-index:10}
+    .top-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .btn{color:#f6f8ff;text-decoration:none;border:1px solid var(--border);background:rgba(255,255,255,.02);border-radius:999px;padding:8px 14px;font-size:.86rem;font-weight:700}
+    .lang-switch{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:999px;padding:3px;gap:3px}
+    .lang-btn{border:0;background:transparent;color:#c7ccd3;font:inherit;font-weight:700;font-size:.76rem;letter-spacing:.5px;padding:7px 11px;border-radius:999px;cursor:pointer}
+    .lang-btn.active{background:var(--accent);color:#fff}
+    main{padding:20px 0 42px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+    .list{list-style:none;padding:0;margin:0;display:grid;gap:10px}.item{border:1px solid var(--border);border-radius:10px;padding:10px;background:rgba(255,255,255,.02)}
+    .line{display:flex;justify-content:space-between;gap:8px;align-items:center}.muted{color:var(--muted)}
+    .status-pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid transparent;font-size:.74rem;font-weight:700}
+    .status-pill.pending{color:#f1bc53;border-color:rgba(241,188,83,.45)} .status-pill.confirmed{color:#4ec786;border-color:rgba(78,199,134,.45)}
+    .status-pill.completed{color:#f5f7ff;border-color:rgba(199,204,211,.45)} .status-pill.declined{color:#ff9f9f;border-color:rgba(255,85,85,.45)}
+    form{display:grid;gap:10px}.field{display:grid;gap:6px} label{color:var(--muted);font-size:.84rem;font-weight:600}
+    input,select{width:100%;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.02);color:var(--text);padding:10px 12px;font:inherit;min-height:42px}
+    button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;color:#fff;background:linear-gradient(135deg,#d11818 0%,#ff4343 100%);cursor:pointer;min-height:42px}
+    .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .quick-actions button{padding:9px 10px;font-size:.83rem}
+    .next-btn{margin-top:2px}
+    .msg{min-height:20px;color:var(--muted)}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="container top-inner"><div><strong>ACE Car Repair | Manager</strong></div><div class="actions"><div class="lang-switch"><button class="lang-btn active" data-lang="nl" type="button">NL</button><button class="lang-btn" data-lang="en" type="button">EN</button><button class="lang-btn" data-lang="fr" type="button">FR</button></div><a class="btn" href="dashboard.html" data-i18n="dashboardBtn">Dashboard</a></div></div></header>
+  <main>
+    <div class="container grid">
+      <section class="card">
+        <h2 data-i18n="todayTitle">Schedule today</h2>
+        <ul class="list" id="todayList"></ul>
+        <h2 data-i18n="incomingTitle">Incoming work</h2>
+        <ul class="list" id="incomingList"></ul>
+      </section>
+      <section class="card">
+        <h2 data-i18n="editTitle">Update status</h2>
+        <form id="statusForm">
+          <div class="field"><label for="jobId" data-i18n="jobId">Job ID</label><input id="jobId" required /></div>
+          <div class="field"><label for="email" data-i18n="email">Customer email</label><input id="email" type="email" /></div>
+          <div class="field"><label for="stage" data-i18n="stage">Stage</label>
+            <select id="stage" required>
+              <option value="appointment_confirmed">Appointment confirmed</option>
+              <option value="diagnostic">Diagnostic</option>
+              <option value="in_repair">In repair</option>
+              <option value="quality_check">Quality check</option>
+              <option value="ready_for_pickup">Ready for pickup</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="quickTitle">Quick actions</label>
+            <div class="quick-actions" id="quickActions">
+              <button type="button" data-stage="appointment_confirmed">appointment_confirmed</button>
+              <button type="button" data-stage="diagnostic">diagnostic</button>
+              <button type="button" data-stage="in_repair">in_repair</button>
+              <button type="button" data-stage="quality_check">quality_check</button>
+              <button type="button" data-stage="ready_for_pickup">ready_for_pickup</button>
+            </div>
+          </div>
+          <button type="button" class="next-btn" id="nextStageBtn" data-i18n="nextBtn">Next stage</button>
+          <button type="submit" data-i18n="saveBtn">Save status</button>
+        </form>
+        <p class="msg" id="msg"></p>
+      </section>
+    </div>
+  </main>
+  <script>
+    const portalApiUrl = 'https://script.google.com/macros/s/AKfycbyVkiMyZjVEkZd9tSIcbvNI7AwlFnkaNlQ0g3L2yuBNdlEaV8-L8X1wXCIkqlZWve33cg/exec';
+    const token = localStorage.getItem('ace_portal_token') || '';
+    if (!token) window.location.href = 'account.html';
+    const q = new URLSearchParams(window.location.search);
+
+    const translations = {
+      nl: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', todayTitle:'Planning vandaag', incomingTitle:'Binnenkomend werk', editTitle:'Status updaten', jobId:'Job ID', email:'Klant e-mail', stage:'Fase', quickTitle:'Snelle acties', nextBtn:'Volgende fase', saveBtn:'Status opslaan', noItems:'Geen items.', loading:'Laden...', saved:'Status opgeslagen.', fail:'Update mislukt.', statusPending:'In afwachting', statusConfirmed:'Bevestigd', statusInProgress:'Bezig', statusCompleted:'Afgerond', open:'Open', stage_appointment_confirmed:'Afspraak bevestigd', stage_diagnostic:'Diagnose', stage_in_repair:'In herstelling', stage_quality_check:'Kwaliteitscontrole', stage_ready_for_pickup:'Klaar voor ophaling' },
+      en: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', todayTitle:'Schedule today', incomingTitle:'Incoming work', editTitle:'Update status', jobId:'Job ID', email:'Customer email', stage:'Stage', quickTitle:'Quick actions', nextBtn:'Next stage', saveBtn:'Save status', noItems:'No items.', loading:'Loading...', saved:'Status saved.', fail:'Update failed.', statusPending:'Pending', statusConfirmed:'Confirmed', statusInProgress:'In progress', statusCompleted:'Completed', open:'Open', stage_appointment_confirmed:'Appointment confirmed', stage_diagnostic:'Diagnostic', stage_in_repair:'In repair', stage_quality_check:'Quality check', stage_ready_for_pickup:'Ready for pickup' },
+      fr: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', todayTitle:'Planning aujourd hui', incomingTitle:'Travaux entrants', editTitle:'Mettre a jour statut', jobId:'ID Job', email:'E-mail client', stage:'Etape', quickTitle:'Actions rapides', nextBtn:'Etape suivante', saveBtn:'Enregistrer statut', noItems:'Aucun element.', loading:'Chargement...', saved:'Statut enregistre.', fail:'Echec mise a jour.', statusPending:'En attente', statusConfirmed:'Confirme', statusInProgress:'En cours', statusCompleted:'Termine', open:'Ouvrir', stage_appointment_confirmed:'Rendez-vous confirme', stage_diagnostic:'Diagnostic', stage_in_repair:'En reparation', stage_quality_check:'Controle qualite', stage_ready_for_pickup:'Pret pour retrait' }
+    };
+    const STAGE_ORDER = ['appointment_confirmed', 'diagnostic', 'in_repair', 'quality_check', 'ready_for_pickup'];
+    let currentLang = localStorage.getItem('ace_lang') || 'nl';
+    const t = (k) => (translations[currentLang] || translations.nl)[k] || translations.nl[k] || '';
+    const todayList = document.getElementById('todayList');
+    const incomingList = document.getElementById('incomingList');
+    const form = document.getElementById('statusForm');
+    const jobId = document.getElementById('jobId');
+    const email = document.getElementById('email');
+    const stage = document.getElementById('stage');
+    const quickActions = document.getElementById('quickActions');
+    const nextStageBtn = document.getElementById('nextStageBtn');
+    const msg = document.getElementById('msg');
+    let lastIncoming = [];
+
+    const setMessage = (text, err) => { msg.textContent = text || ''; msg.style.color = err ? '#ff9f9f' : '#a6b0bc'; };
+    const statusClass = (s) => { const v = String(s || '').toUpperCase(); if (v === 'PENDING') return 'pending'; if (v === 'CONFIRMED') return 'confirmed'; if (v === 'IN_PROGRESS') return 'confirmed'; if (v === 'COMPLETED') return 'completed'; return 'declined'; };
+    const statusLabel = (s) => { const v = String(s || '').toUpperCase(); if (v === 'PENDING') return t('statusPending'); if (v === 'CONFIRMED') return t('statusConfirmed'); if (v === 'IN_PROGRESS') return t('statusInProgress'); if (v === 'COMPLETED') return t('statusCompleted'); return v || '-'; };
+    const todayIso = () => { const d = new Date(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); return `${d.getFullYear()}-${m}-${day}`; };
+    const mapIncomingToStage = (status) => {
+      const s = String(status || '').toUpperCase();
+      if (s === 'COMPLETED') return 'ready_for_pickup';
+      return 'appointment_confirmed';
+    };
+    const loadCurrentRepairStage = (id, customerEmail) => {
+      if (!id) return Promise.resolve();
+      const params = new URLSearchParams({ action: 'repair_status', job_id: id });
+      if (customerEmail) params.set('email', customerEmail);
+      return fetch(`${portalApiUrl}?${params.toString()}`, { cache: 'no-store' })
+        .then((r) => r.json().catch(() => ({})))
+        .then((data) => {
+          if (data && data.ok && data.currentStatus) {
+            stage.value = String(data.currentStatus || mapIncomingToStage(''));
+          }
+        })
+        .catch(() => {});
+    };
+    const openItem = (a) => {
+      jobId.value = String(a.id || '');
+      email.value = String(a.email || '');
+      stage.value = mapIncomingToStage(a.status);
+      loadCurrentRepairStage(String(a.id || ''), String(a.email || ''));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    const renderList = (el, items) => {
+      if (!items.length) { el.innerHTML = `<li class="item muted">${t('noItems')}</li>`; return; }
+      el.innerHTML = items.map((a, i) => `<li class="item"><div class="line"><strong>${a.service || '-'}</strong><span class="status-pill ${statusClass(a.status)}">${statusLabel(a.status)}</span></div><div class="line"><span>${a.id || '-'}</span><span>${a.preferred_date || '-'}</span></div><div class="line"><span>${a.vehicle || '-'}</span><button type="button" data-open="${i}">${t('open')}</button></div></li>`).join('');
+      el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openItem(items[Number(b.dataset.open || 0)] || {})));
+    };
+    const applyLanguage = (lang) => {
+      currentLang = translations[lang] ? lang : 'nl';
+      localStorage.setItem('ace_lang', currentLang);
+      document.documentElement.lang = currentLang;
+      document.title = t('pageTitle');
+      document.querySelectorAll('[data-i18n]').forEach((el) => { const v = t(el.dataset.i18n); if (v) el.textContent = v; });
+      Array.from(stage.options).forEach((opt) => { opt.textContent = t(`stage_${opt.value}`) || opt.value; });
+      quickActions.querySelectorAll('button[data-stage]').forEach((btn) => {
+        const key = String(btn.dataset.stage || '');
+        btn.textContent = t(`stage_${key}`) || key;
+      });
+      document.querySelectorAll('.lang-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+      const today = lastIncoming.filter((a) => a.preferred_date === todayIso());
+      renderList(todayList, today);
+      renderList(incomingList, lastIncoming);
+    };
+    document.querySelectorAll('.lang-btn').forEach((btn) => btn.addEventListener('click', () => applyLanguage(btn.dataset.lang)));
+
+    const postApi = async (payload) => {
+      const response = await fetch(portalApiUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data?.ok !== true) throw new Error(data?.error || 'Request failed');
+      return data;
+    };
+    const updateStatus = (targetStage) => {
+      setMessage(t('loading'));
+      return postApi({
+        action: 'update_repair_status',
+        token,
+        job_id: String(jobId.value || '').trim(),
+        customer_email: String(email.value || '').trim(),
+        currentStatus: String(targetStage || stage.value || '').trim()
+      })
+        .then(() => { stage.value = String(targetStage || stage.value || ''); setMessage(t('saved')); load(); })
+        .catch(() => setMessage(t('fail'), true));
+    };
+    const load = () => {
+      setMessage(t('loading'));
+      postApi({ action: 'dashboard', token })
+        .then((data) => {
+          if (String(data?.user?.role || '') !== 'manager') throw new Error('No access');
+          lastIncoming = Array.isArray(data?.manager_tools?.incoming_work) ? data.manager_tools.incoming_work : [];
+          if (q.get('job_id')) jobId.value = q.get('job_id');
+          if (q.get('email')) email.value = q.get('email');
+          applyLanguage(currentLang);
+          setMessage('');
+        })
+        .catch((err) => {
+          const text = String(err?.message || '');
+          if (/Sessie ongeldig|expired|invalid|verlopen|No access/i.test(text)) {
+            localStorage.removeItem('ace_portal_token');
+            localStorage.removeItem('ace_portal_user');
+            window.location.href = 'account.html';
+            return;
+          }
+          setMessage(t('fail'), true);
+        });
+    };
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      updateStatus(String(stage.value || '').trim());
+    });
+    quickActions.querySelectorAll('button[data-stage]').forEach((btn) => {
+      btn.addEventListener('click', () => updateStatus(String(btn.dataset.stage || '').trim()));
+    });
+    nextStageBtn.addEventListener('click', () => {
+      const current = String(stage.value || '').trim();
+      const idx = STAGE_ORDER.indexOf(current);
+      const next = idx >= 0 && idx < STAGE_ORDER.length - 1 ? STAGE_ORDER[idx + 1] : STAGE_ORDER[STAGE_ORDER.length - 1];
+      updateStatus(next);
+    });
+    load();
+  </script>
+</body>
+</html>

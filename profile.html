@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACE Car Repair | Profiel</title>
+  <style>
+    :root {
+      --bg: #0f1318;
+      --panel: #171d24;
+      --border: rgba(199, 204, 211, 0.22);
+      --text: #f3f6fb;
+      --muted: #a6b0bc;
+      --accent: #e11919;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Montserrat", "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
+    .container { width: min(900px, 92%); margin-inline: auto; }
+    .top { position: sticky; top: 0; z-index: 10; background: rgba(13, 16, 20, 0.92); border-bottom: 1px solid var(--border); }
+    .top-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn { color: #f6f8ff; text-decoration: none; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.02); border-radius: 999px; padding: 8px 14px; font-size: 0.86rem; font-weight: 700; }
+    .lang-switch { display: inline-flex; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); border-radius: 999px; padding: 3px; gap: 3px; }
+    .lang-btn { border: 0; background: transparent; color: #c7ccd3; font: inherit; font-weight: 700; font-size: 0.76rem; letter-spacing: 0.5px; padding: 7px 11px; border-radius: 999px; cursor: pointer; }
+    .lang-btn.active { background: var(--accent); color: #fff; }
+    main { padding: 22px 0 46px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+    .card h1 { margin: 0 0 8px; font-size: clamp(1.3rem, 4.3vw, 1.8rem); }
+    .muted { color: var(--muted); margin-top: 0; }
+    form { display: grid; gap: 10px; margin-top: 12px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { display: grid; gap: 6px; }
+    .field-full { grid-column: 1 / -1; }
+    label { font-size: 0.84rem; color: var(--muted); font-weight: 600; }
+    input, textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; background: rgba(255, 255, 255, 0.02); color: var(--text); padding: 11px 12px; font: inherit; min-height: 44px; }
+    textarea { min-height: 94px; resize: vertical; }
+    button[type="submit"] { border: 0; border-radius: 10px; padding: 12px 14px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #d11818 0%, #ff4343 100%); cursor: pointer; min-height: 44px; }
+    .msg { margin-top: 10px; color: var(--muted); min-height: 20px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="container top-inner">
+      <div><strong>ACE Car Repair</strong></div>
+      <div class="actions">
+        <div class="lang-switch" role="group" aria-label="Language switch">
+          <button class="lang-btn active" data-lang="nl" type="button">NL</button>
+          <button class="lang-btn" data-lang="en" type="button">EN</button>
+          <button class="lang-btn" data-lang="fr" type="button">FR</button>
+        </div>
+        <a class="btn" href="dashboard.html" data-i18n="dashboardBtn">Dashboard</a>
+        <a class="btn" href="status.html" data-i18n="statusBtn">Live Status</a>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <section class="card">
+        <h1 data-i18n="title">Mijn profiel</h1>
+        <p class="muted" data-i18n="intro">Sla je gegevens op zodat toekomstige afspraken sneller gaan.</p>
+        <form id="profileForm">
+          <div class="grid">
+            <div class="field">
+              <label for="fullName" data-i18n="fullName">Volledige naam</label>
+              <input id="fullName" type="text" />
+            </div>
+            <div class="field">
+              <label for="phone" data-i18n="phone">Telefoon</label>
+              <input id="phone" type="tel" />
+            </div>
+            <div class="field">
+              <label for="vehicle" data-i18n="vehicle">Standaard voertuig</label>
+              <input id="vehicle" type="text" />
+            </div>
+            <div class="field">
+              <label for="plate" data-i18n="plate">Nummerplaat</label>
+              <input id="plate" type="text" />
+            </div>
+            <div class="field field-full">
+              <label for="notes" data-i18n="notes">Extra info voor afspraken</label>
+              <textarea id="notes"></textarea>
+            </div>
+          </div>
+          <button type="submit" data-i18n="saveBtn">Opslaan</button>
+        </form>
+        <div class="msg" id="msg"></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    const portalApiUrl = 'https://script.google.com/macros/s/AKfycbyVkiMyZjVEkZd9tSIcbvNI7AwlFnkaNlQ0g3L2yuBNdlEaV8-L8X1wXCIkqlZWve33cg/exec';
+    const token = localStorage.getItem('ace_portal_token') || '';
+    if (!token) window.location.href = 'account.html';
+
+    const translations = {
+      nl: {
+        pageTitle: 'ACE Car Repair | Profiel',
+        dashboardBtn: 'Dashboard',
+        statusBtn: 'Live Status',
+        title: 'Mijn profiel',
+        intro: 'Sla je gegevens op zodat toekomstige afspraken sneller gaan.',
+        fullName: 'Volledige naam',
+        phone: 'Telefoon',
+        vehicle: 'Standaard voertuig',
+        plate: 'Nummerplaat',
+        notes: 'Extra info voor afspraken',
+        saveBtn: 'Opslaan',
+        loading: 'Laden...',
+        saving: 'Opslaan...',
+        saved: 'Profiel opgeslagen.',
+        loadFail: 'Profiel laden mislukt.',
+        saveFail: 'Opslaan mislukt.'
+      },
+      en: {
+        pageTitle: 'ACE Car Repair | Profile',
+        dashboardBtn: 'Dashboard',
+        statusBtn: 'Live Status',
+        title: 'My profile',
+        intro: 'Save your details so future appointments are faster.',
+        fullName: 'Full name',
+        phone: 'Phone',
+        vehicle: 'Default vehicle',
+        plate: 'License plate',
+        notes: 'Extra info for appointments',
+        saveBtn: 'Save',
+        loading: 'Loading...',
+        saving: 'Saving...',
+        saved: 'Profile saved.',
+        loadFail: 'Failed to load profile.',
+        saveFail: 'Failed to save profile.'
+      },
+      fr: {
+        pageTitle: 'ACE Car Repair | Profil',
+        dashboardBtn: 'Dashboard',
+        statusBtn: 'Live Status',
+        title: 'Mon profil',
+        intro: 'Enregistrez vos donnees pour accelerer les prochains rendez-vous.',
+        fullName: 'Nom complet',
+        phone: 'Telephone',
+        vehicle: 'Vehicule par defaut',
+        plate: 'Plaque',
+        notes: 'Infos supplementaires pour rendez-vous',
+        saveBtn: 'Enregistrer',
+        loading: 'Chargement...',
+        saving: 'Enregistrement...',
+        saved: 'Profil enregistre.',
+        loadFail: 'Echec chargement profil.',
+        saveFail: 'Echec enregistrement.'
+      }
+    };
+
+    const form = document.getElementById('profileForm');
+    const msg = document.getElementById('msg');
+    const fullName = document.getElementById('fullName');
+    const phone = document.getElementById('phone');
+    const vehicle = document.getElementById('vehicle');
+    const plate = document.getElementById('plate');
+    const notes = document.getElementById('notes');
+    let currentLang = localStorage.getItem('ace_lang') || 'nl';
+
+    const t = (key) => {
+      const pack = translations[currentLang] || translations.nl;
+      return pack[key] || (translations.nl[key] || '');
+    };
+    const setMessage = (text, error) => {
+      msg.textContent = text || '';
+      msg.style.color = error ? '#ff9f9f' : '#a6b0bc';
+    };
+    const applyLanguage = (lang) => {
+      currentLang = translations[lang] ? lang : 'nl';
+      localStorage.setItem('ace_lang', currentLang);
+      document.documentElement.lang = currentLang;
+      document.title = t('pageTitle');
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.dataset.i18n;
+        const value = t(key);
+        if (value) el.textContent = value;
+      });
+      document.querySelectorAll('.lang-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+      });
+    };
+    document.querySelectorAll('.lang-btn').forEach((btn) => {
+      btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
+    });
+    applyLanguage(currentLang);
+
+    const postApi = async (payload) => {
+      const response = await fetch(portalApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data?.ok !== true) throw new Error(data?.error || 'Request failed');
+      return data;
+    };
+
+    const loadProfile = () => {
+      setMessage(t('loading'));
+      postApi({ action: 'get_profile', token })
+        .then((data) => {
+          const p = data.profile || {};
+          fullName.value = p.full_name || '';
+          phone.value = p.phone || '';
+          vehicle.value = p.vehicle || '';
+          plate.value = p.license_plate || '';
+          notes.value = p.notes || '';
+          setMessage('');
+        })
+        .catch((err) => {
+          const text = String(err?.message || t('loadFail'));
+          const sessionError = /Sessie ongeldig|expired|invalid|verlopen/i.test(text);
+          if (sessionError) {
+            localStorage.removeItem('ace_portal_token');
+            localStorage.removeItem('ace_portal_user');
+            window.location.href = 'account.html';
+            return;
+          }
+          setMessage(t('loadFail'), true);
+        });
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      setMessage(t('saving'));
+      postApi({
+        action: 'save_profile',
+        token,
+        full_name: String(fullName.value || '').trim(),
+        phone: String(phone.value || '').trim(),
+        vehicle: String(vehicle.value || '').trim(),
+        license_plate: String(plate.value || '').trim(),
+        notes: String(notes.value || '').trim()
+      })
+        .then(() => {
+          setMessage(t('saved'));
+        })
+        .catch(() => {
+          setMessage(t('saveFail'), true);
+        });
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>

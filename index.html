@@ -878,6 +878,14 @@
       font-size: 0.9rem;
     }
 
+    .appointment-note.is-hidden {
+      display: none;
+    }
+
+    #appointment {
+      scroll-margin-top: 84px;
+    }
+
     .footer {
       padding: 72px 0 26px;
       background: #101317;
@@ -1412,7 +1420,7 @@
             </div>
           </div>
           <button class="btn btn-primary" type="submit" data-i18n="submitAppt">Afspraak Aanvragen</button>
-          <p class="appointment-note" id="appointmentNote" data-i18n="apptNote" aria-live="polite">Na verzenden opent je mail-app met een ingevulde aanvraag.</p>
+          <p class="appointment-note is-hidden" id="appointmentNote" data-i18n="apptNote" aria-live="polite">Na verzenden opent je mail-app met een ingevulde aanvraag.</p>
         </form>
       </div>
     </section>
@@ -1902,6 +1910,7 @@
     const siteHeader = document.querySelector(".site-header");
     const navToggle = document.getElementById("navToggle");
     const navLinks = document.querySelectorAll(".nav-links a");
+    const appointmentSection = document.getElementById("appointment");
 
     const closeMobileMenu = () => {
       if (!siteHeader || !navToggle) return;
@@ -1918,6 +1927,20 @@
     navLinks.forEach((link) => link.addEventListener("click", closeMobileMenu));
     window.addEventListener("resize", () => {
       if (window.innerWidth > 860) closeMobileMenu();
+    });
+
+    const scrollToAppointmentWithOffset = (event) => {
+      if (!appointmentSection) return;
+      event.preventDefault();
+      const headerHeight = siteHeader ? siteHeader.offsetHeight : 0;
+      const offset = Math.max(80, headerHeight + 10);
+      const top = appointmentSection.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      closeMobileMenu();
+    };
+
+    document.querySelectorAll('a[href="#appointment"]').forEach((link) => {
+      link.addEventListener("click", scrollToAppointmentWithOffset);
     });
 
     const scrollBar = document.getElementById("scrollProgressBar");
@@ -1948,18 +1971,66 @@
     const appointmentNote = document.getElementById("appointmentNote");
     const appointmentSubmitBtn = appointmentForm?.querySelector("button[type=\"submit\"]");
     const dashboardCacheKey = "ace_dashboard_cache_v1";
+    const fieldName = document.getElementById("apptName");
+    const fieldPhone = document.getElementById("apptPhone");
+    const fieldEmail = document.getElementById("apptEmail");
+    const fieldVehicle = document.getElementById("apptVehicle");
+    const fieldDetails = document.getElementById("apptDetails");
     const formatUiDateTime = (lang, value) => {
       const d = value instanceof Date ? value : new Date(value);
       if (Number.isNaN(d.getTime())) return String(value || "");
       const locale = lang === "fr" ? "fr-BE" : (lang === "en" ? "en-GB" : "nl-BE");
       return new Intl.DateTimeFormat(locale, {
         year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
+        month: "numeric",
+        day: "numeric",
         hour: "2-digit",
         minute: "2-digit"
       }).format(d);
     };
+
+    const setAppointmentNote = (text) => {
+      if (!appointmentNote) return;
+      appointmentNote.textContent = text || "";
+      appointmentNote.classList.toggle("is-hidden", !text);
+    };
+
+    setAppointmentNote("");
+
+    const applyProfilePrefill = (profile, user) => {
+      const p = profile && typeof profile === "object" ? profile : {};
+      const u = user && typeof user === "object" ? user : {};
+      if (fieldName && !fieldName.value) fieldName.value = String(p.full_name || u.name || "");
+      if (fieldPhone && !fieldPhone.value) fieldPhone.value = String(p.phone || "");
+      if (fieldEmail && !fieldEmail.value) fieldEmail.value = String(u.email || "");
+      if (fieldVehicle && !fieldVehicle.value) {
+        const car = [String(p.vehicle || ""), String(p.license_plate || "")].filter((v) => !!v).join(" | ");
+        fieldVehicle.value = car;
+      }
+      if (fieldDetails && !fieldDetails.value) {
+        fieldDetails.value = String(p.notes || "");
+      }
+    };
+
+    const tryProfilePrefill = () => {
+      const portalToken = localStorage.getItem("ace_portal_token") || "";
+      if (!portalToken || !bookingApiUrl) return;
+      fetch(bookingApiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "dashboard", token: portalToken })
+      })
+        .then((r) => r.json().catch(() => ({})))
+        .then((data) => {
+          if (!data || data.ok !== true) return;
+          applyProfilePrefill(data.customer_profile || {}, data.user || {});
+        })
+        .catch(() => {
+          // Keep guest flow unaffected if profile prefill cannot be loaded.
+        });
+    };
+
+    tryProfilePrefill();
 
     if (appointmentDateInput && !window.flatpickr) {
       appointmentDateInput.min = new Date().toISOString().split("T")[0];
@@ -1980,7 +2051,7 @@
         : `ACE Afspraakaanvraag | ${selectedService} | ${selectedDate}`;
 
       if (!selectedDateObj || Number.isNaN(selectedDateObj.getTime()) || isDateUnavailable(selectedDateObj)) {
-        if (appointmentNote) appointmentNote.textContent = dict.apptInvalidDate || "";
+        setAppointmentNote(dict.apptInvalidDate || "");
         return;
       }
 
@@ -2029,9 +2100,10 @@
         ];
 
       if (appointmentSubmitBtn) appointmentSubmitBtn.disabled = true;
-      if (appointmentNote) appointmentNote.textContent = dict.apptSending || "";
+      setAppointmentNote(dict.apptSending || "");
 
       const templateParams = {
+        action: "book_appointment",
         name: String(data.get("name") || ""),
         phone: String(data.get("phone") || ""),
         email: String(data.get("email") || ""),
@@ -2066,7 +2138,7 @@
 
       const apiNotConfigured = !bookingApiUrl || bookingApiUrl.includes("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL");
       if (apiNotConfigured) {
-        if (appointmentNote) appointmentNote.textContent = dict.apptError || "";
+        setAppointmentNote(dict.apptError || "");
         openMailFallback();
         if (appointmentSubmitBtn) appointmentSubmitBtn.disabled = false;
         return;
@@ -2090,7 +2162,7 @@
           } else if (appointmentDateInput) {
             appointmentDateInput.min = toIsoDate(getMinAllowedDate());
           }
-          if (appointmentNote) appointmentNote.textContent = dict.apptSuccess || "";
+          setAppointmentNote(dict.apptSuccess || "");
           const portalToken = localStorage.getItem("ace_portal_token") || "";
           if (portalToken) {
             fetch(bookingApiUrl, {
@@ -2111,7 +2183,7 @@
         })
         .catch((err) => {
           const text = err?.message ? ` ${err.message}` : "";
-          if (appointmentNote) appointmentNote.textContent = `${dict.apptError || ""}${text}`.trim();
+          setAppointmentNote(`${dict.apptError || ""}${text}`.trim());
           openMailFallback();
         })
         .finally(() => {

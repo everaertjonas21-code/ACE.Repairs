@@ -301,6 +301,7 @@
         </div>
         <a class="btn" href="index.html" data-i18n="websiteBtn">Website</a>
         <a class="btn" href="status.html" data-i18n="statusPageBtn">Live Status</a>
+        <a class="btn" href="profile.html" data-i18n="profileBtn">Profiel</a>
         <button class="btn btn-accent" id="logoutBtn" type="button" data-i18n="logoutBtn">Uitloggen</button>
       </div>
     </div>
@@ -322,14 +323,21 @@
           <div class="voucher-list" id="voucherList"></div>
         </section>
 
-        <section class="card" style="grid-column: 1 / -1;">
+        <section class="card" style="grid-column: 1 / -1;" id="upcomingUserCard">
           <h2 data-i18n="upcomingTitle">Upcoming Appointments</h2>
           <ul class="list" id="upcomingAppointmentsList">
             <li class="list-item muted">Laden...</li>
           </ul>
         </section>
 
-        <section class="card" style="grid-column: 1 / -1;">
+        <section class="card" style="grid-column: 1 / -1;" id="upcomingScheduleCard">
+          <h2 data-i18n="upcomingScheduleTitle">Upcoming Schedule</h2>
+          <ul class="list" id="upcomingScheduleList">
+            <li class="list-item muted">Laden...</li>
+          </ul>
+        </section>
+
+        <section class="card" style="grid-column: 1 / -1;" id="appointmentsUserCard">
           <h2 data-i18n="appointmentsTitle">Mijn Afspraken</h2>
           <ul class="list" id="appointmentsList">
             <li class="list-item muted">Laden...</li>
@@ -339,6 +347,11 @@
         <section class="card" style="grid-column: 1 / -1; display:none;" id="managerCard">
           <h2 data-i18n="managerTitle">Manager Tools</h2>
           <div class="manager-tools">
+            <div>
+              <h3 data-i18n="incomingWorkTitle">Binnenkomend werk</h3>
+              <ul class="list" id="incomingWorkList"></ul>
+              <p><a class="btn" href="manager-work.html" data-i18n="openManagerPage">Open status page</a></p>
+            </div>
             <form class="manager-form" id="grantStampForm">
               <input type="email" id="grantEmail" placeholder="customer@email.com" required />
               <input type="number" id="grantCount" min="1" max="20" value="1" required />
@@ -374,12 +387,18 @@
         pageTitle: 'ACE Car Repair | Klantdashboard',
         websiteBtn: 'Website',
         statusPageBtn: 'Live Status',
+        profileBtn: 'Profiel',
         logoutBtn: 'Uitloggen',
         profileTitle: 'Mijn Profiel',
         loyaltyTitle: 'Loyaliteit (Stickers)',
         upcomingTitle: 'Komende afspraken',
+        upcomingScheduleTitle: 'Komende planning',
         appointmentsTitle: 'Mijn Afspraken',
         managerTitle: 'Manager Tools',
+        incomingWorkTitle: 'Binnenkomend werk',
+        incomingEmpty: 'Geen binnenkomend werk.',
+        manageBtn: 'Beheer',
+        openManagerPage: 'Open status pagina',
         grantBtn: 'Geef sticker(s)',
         statusUpdateBtn: 'Update status',
         grantOk: 'Sticker(s) toegekend.',
@@ -391,6 +410,7 @@
         noActive: 'Geen actieve afspraak.',
         noAppointments: 'Nog geen afspraken gevonden.',
         noUpcoming: 'Geen komende afspraken.',
+        noSchedule: 'Geen bevestigde slots.',
         loyaltyLine: '{stamps} sticker(s), {rewards} reward(s) beschikbaar. Elke 5 stickers = 25% korting op je volgende nazicht/check-up.',
         voucherTitle: 'Beschikbare vouchers:',
         voucherEmpty: 'Nog geen voucher actief.',
@@ -410,6 +430,10 @@
         client: 'Client',
         serviceDefault: 'Dienst',
         unknownStatus: 'ONBEKEND',
+        statusPending: 'In afwachting',
+        statusConfirmed: 'Bevestigd',
+        statusCompleted: 'Afgerond',
+        statusDeclined: 'Geweigerd',
         invalidSession: 'Sessie verlopen. Log opnieuw in.',
         tempLoadError: 'Tijdelijke laadfout. Probeer opnieuw.'
       },
@@ -417,12 +441,18 @@
         pageTitle: 'ACE Car Repair | Customer Dashboard',
         websiteBtn: 'Website',
         statusPageBtn: 'Live Status',
+        profileBtn: 'Profile',
         logoutBtn: 'Logout',
         profileTitle: 'My Profile',
         loyaltyTitle: 'Loyalty (Stamps)',
         upcomingTitle: 'Upcoming appointments',
+        upcomingScheduleTitle: 'Upcoming schedule',
         appointmentsTitle: 'My Appointments',
         managerTitle: 'Manager Tools',
+        incomingWorkTitle: 'Incoming work',
+        incomingEmpty: 'No incoming work.',
+        manageBtn: 'Manage',
+        openManagerPage: 'Open status page',
         grantBtn: 'Grant stamp(s)',
         statusUpdateBtn: 'Update status',
         grantOk: 'Stamp(s) granted.',
@@ -434,6 +464,7 @@
         noActive: 'No active appointment.',
         noAppointments: 'No appointments found yet.',
         noUpcoming: 'No upcoming appointments.',
+        noSchedule: 'No confirmed slots.',
         loyaltyLine: '{stamps} stamp(s), {rewards} reward(s) available. Every 5 stamps = 25% off your next inspection/check-up.',
         voucherTitle: 'Available vouchers:',
         voucherEmpty: 'No active voucher yet.',
@@ -453,6 +484,10 @@
         client: 'Client',
         serviceDefault: 'Service',
         unknownStatus: 'UNKNOWN',
+        statusPending: 'Pending',
+        statusConfirmed: 'Confirmed',
+        statusCompleted: 'Completed',
+        statusDeclined: 'Declined',
         invalidSession: 'Session expired. Please log in again.',
         tempLoadError: 'Temporary load error. Please retry.'
       },
@@ -460,12 +495,18 @@
         pageTitle: 'ACE Car Repair | Tableau Client',
         websiteBtn: 'Site',
         statusPageBtn: 'Live Status',
+        profileBtn: 'Profil',
         logoutBtn: 'Se dÃ©connecter',
         profileTitle: 'Mon Profil',
         loyaltyTitle: 'FidÃ©litÃ© (Stickers)',
         upcomingTitle: 'Rendez-vous a venir',
+        upcomingScheduleTitle: 'Planning a venir',
         appointmentsTitle: 'Mes Rendez-vous',
         managerTitle: 'Outils Manager',
+        incomingWorkTitle: 'Travaux entrants',
+        incomingEmpty: 'Aucun travail entrant.',
+        manageBtn: 'Gerer',
+        openManagerPage: 'Ouvrir page statut',
         grantBtn: 'Donner sticker(s)',
         statusUpdateBtn: 'Mettre a jour statut',
         grantOk: 'Sticker(s) attribuÃ©(s).',
@@ -477,6 +518,7 @@
         noActive: 'Aucun rendez-vous actif.',
         noAppointments: 'Aucun rendez-vous trouvÃ©.',
         noUpcoming: 'Aucun rendez-vous a venir.',
+        noSchedule: 'Aucun slot confirme.',
         loyaltyLine: '{stamps} sticker(s), {rewards} rÃ©compense(s) disponible(s). Chaque 5 stickers = 25% de rÃ©duction sur votre prochain contrÃ´le/check-up.',
         voucherTitle: 'Bons disponibles :',
         voucherEmpty: 'Aucun bon actif.',
@@ -496,6 +538,10 @@
         client: 'Client',
         serviceDefault: 'Service',
         unknownStatus: 'INCONNU',
+        statusPending: 'En attente',
+        statusConfirmed: 'Confirme',
+        statusCompleted: 'Termine',
+        statusDeclined: 'Refuse',
         invalidSession: 'Session expirÃ©e. Reconnectez-vous.',
         tempLoadError: 'Erreur temporaire. RÃ©essayez.'
       }
@@ -508,6 +554,10 @@
     const stampGrid = document.getElementById('stampGrid');
     const appointmentsList = document.getElementById('appointmentsList');
     const upcomingAppointmentsList = document.getElementById('upcomingAppointmentsList');
+    const upcomingScheduleList = document.getElementById('upcomingScheduleList');
+    const upcomingScheduleCard = document.getElementById('upcomingScheduleCard');
+    const upcomingUserCard = document.getElementById('upcomingUserCard');
+    const appointmentsUserCard = document.getElementById('appointmentsUserCard');
     const voucherList = document.getElementById('voucherList');
     const logoutBtn = document.getElementById('logoutBtn');
     const managerCard = document.getElementById('managerCard');
@@ -520,6 +570,7 @@
     const statusStage = document.getElementById('statusStage');
     const managerMsg = document.getElementById('managerMsg');
     const managerAccountsList = document.getElementById('managerAccountsList');
+    const incomingWorkList = document.getElementById('incomingWorkList');
     let lastDashboardData = null;
     const t = (key) => {
       const langPack = translations[currentLang] || {};
@@ -555,8 +606,8 @@
       const locale = currentLang === 'fr' ? 'fr-BE' : (currentLang === 'en' ? 'en-GB' : 'nl-BE');
       return new Intl.DateTimeFormat(locale, {
         year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
+        month: 'numeric',
+        day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
       }).format(d);
@@ -565,10 +616,18 @@
     const statusClass = (status) => {
       const s = String(status || '').toUpperCase();
       if (s === 'PENDING') return 'pending';
-      if (s === 'CONFIRMED') return 'confirmed';
+      if (s === 'CONFIRMED' || s === 'IN_PROGRESS') return 'confirmed';
       if (s === 'COMPLETED') return 'completed';
       if (s === 'DECLINED') return 'declined';
       return '';
+    };
+    const statusLabel = (status) => {
+      const s = String(status || '').toUpperCase();
+      if (s === 'PENDING') return t('statusPending');
+      if (s === 'CONFIRMED' || s === 'IN_PROGRESS') return t('statusConfirmed');
+      if (s === 'COMPLETED') return t('statusCompleted');
+      if (s === 'DECLINED') return t('statusDeclined');
+      return t('unknownStatus');
     };
     const fetchDashboard = async () => {
       const response = await fetch(portalApiUrl, {
@@ -646,7 +705,7 @@
         <li class="list-item">
           <div class="line">
             <strong>${a.service || t('serviceDefault')}</strong>
-            <span class="status-pill ${statusClass(a.status)}">${a.status || t('unknownStatus')}</span>
+            <span class="status-pill ${statusClass(a.status)}">${statusLabel(a.status)}</span>
           </div>
           <div class="line"><span>${t('jobId')}</span><span>${a.id || '-'}</span></div>
           <div class="line"><span>${t('date')}</span><span>${a.preferred_date || '-'}</span></div>
@@ -701,6 +760,19 @@
         </li>
       `).join('');
     };
+    const renderUpcomingSchedule = (items) => {
+      if (!Array.isArray(items) || items.length === 0) {
+        upcomingScheduleList.innerHTML = `<li class="list-item muted">${t('noSchedule')}</li>`;
+        return;
+      }
+      upcomingScheduleList.innerHTML = items.map((a) => `
+        <li class="list-item">
+          <div class="line"><strong>${a.service || t('serviceDefault')}</strong><span>${a.preferred_date || '-'}</span></div>
+          <div class="line"><span>${t('jobId')}</span><span>${a.id || '-'}</span></div>
+          <div class="line"><span>${t('vehicle')}</span><span>${a.vehicle || '-'}</span></div>
+        </li>
+      `).join('');
+    };
 
     const renderManagerAccounts = (items) => {
       if (!Array.isArray(items) || items.length === 0) {
@@ -713,6 +785,32 @@
           <div class="line"><span>Role: ${u.role || '-'}</span><span>Stickers: ${Number(u.stamp_count || 0)}</span></div>
         </li>
       `).join('');
+    };
+    const renderIncomingWork = (items) => {
+      const list = Array.isArray(items) ? items : [];
+      if (!list.length) {
+        incomingWorkList.innerHTML = `<li class="list-item muted">${t('incomingEmpty')}</li>`;
+        return;
+      }
+      incomingWorkList.innerHTML = list.map((a) => {
+        const params = new URLSearchParams({
+          job_id: String(a.id || ''),
+          email: String(a.email || '')
+        }).toString();
+        return `
+          <li class="list-item">
+            <div class="line">
+              <strong>${a.service || t('serviceDefault')}</strong>
+              <span class="status-pill ${statusClass(a.status)}">${statusLabel(a.status)}</span>
+            </div>
+            <div class="line"><span>${t('jobId')}</span><span>${a.id || '-'}</span></div>
+            <div class="line"><span>${t('date')}</span><span>${a.preferred_date || '-'}</span></div>
+            <div class="line"><span>${t('vehicle')}</span><span>${a.vehicle || '-'}</span></div>
+            <div class="line"><span>Email</span><span>${a.email || '-'}</span></div>
+            <div class="line"><span></span><a class="btn" href="manager-work.html?${params}">${t('manageBtn')}</a></div>
+          </li>
+        `;
+      }).join('');
     };
 
     const render = (data) => {
@@ -730,12 +828,20 @@
       renderVouchers(vouchers);
 
       renderUpcomingAppointments(data.upcoming_appointments || []);
+      renderUpcomingSchedule(data.upcoming_schedule || []);
       renderAppointments(data.appointments || []);
       if (data.user?.role === 'manager') {
         managerCard.style.display = 'block';
+        upcomingUserCard.style.display = 'none';
+        upcomingScheduleCard.style.display = 'none';
+        appointmentsUserCard.style.display = 'none';
         renderManagerAccounts(data.manager_tools?.accounts || []);
+        renderIncomingWork(data.manager_tools?.incoming_work || []);
       } else {
         managerCard.style.display = 'none';
+        upcomingUserCard.style.display = 'block';
+        upcomingScheduleCard.style.display = 'block';
+        appointmentsUserCard.style.display = 'block';
       }
     };
 
@@ -810,6 +916,7 @@
           managerMsg.textContent = String(err?.message || t('statusUpdateFail'));
         });
     });
+
   </script>
 </body>
 </html>

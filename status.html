@@ -152,7 +152,7 @@
       const d = new Date(value);
       if (Number.isNaN(d.getTime())) return String(value || '-');
       const locale = currentLang === 'fr' ? 'fr-BE' : (currentLang === 'en' ? 'en-GB' : 'nl-BE');
-      return new Intl.DateTimeFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(d);
+      return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d);
     };
     const applyLanguage = (lang) => {
       currentLang = translations[lang] ? lang : 'nl';
