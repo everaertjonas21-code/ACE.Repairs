@@ -323,23 +323,16 @@
           <div class="voucher-list" id="voucherList"></div>
         </section>
 
-        <section class="card" style="grid-column: 1 / -1;" id="upcomingUserCard">
-          <h2 data-i18n="upcomingTitle">Upcoming Appointments</h2>
-          <ul class="list" id="upcomingAppointmentsList">
-            <li class="list-item muted">Laden...</li>
-          </ul>
-        </section>
-
-        <section class="card" style="grid-column: 1 / -1;" id="upcomingScheduleCard">
-          <h2 data-i18n="upcomingScheduleTitle">Upcoming Schedule</h2>
-          <ul class="list" id="upcomingScheduleList">
-            <li class="list-item muted">Laden...</li>
-          </ul>
-        </section>
-
         <section class="card" style="grid-column: 1 / -1;" id="appointmentsUserCard">
-          <h2 data-i18n="appointmentsTitle">Mijn Afspraken</h2>
+          <h2 data-i18n="activeAppointmentsTitle">Actieve Afspraken</h2>
           <ul class="list" id="appointmentsList">
+            <li class="list-item muted">Laden...</li>
+          </ul>
+        </section>
+
+        <section class="card" style="grid-column: 1 / -1;" id="historyCard">
+          <h2 data-i18n="historyTitle">Historiek</h2>
+          <ul class="list" id="historyList">
             <li class="list-item muted">Laden...</li>
           </ul>
         </section>
@@ -349,6 +342,7 @@
           <div class="manager-tools">
             <div>
               <h3 data-i18n="incomingWorkTitle">Binnenkomend werk</h3>
+              <p class="muted" id="incomingWorkSummary"></p>
               <ul class="list" id="incomingWorkList"></ul>
               <p><a class="btn" href="manager-work.html" data-i18n="openManagerPage">Open status page</a></p>
             </div>
@@ -391,9 +385,8 @@
         logoutBtn: 'Uitloggen',
         profileTitle: 'Mijn Profiel',
         loyaltyTitle: 'Loyaliteit (Stickers)',
-        upcomingTitle: 'Komende afspraken',
-        upcomingScheduleTitle: 'Komende planning',
-        appointmentsTitle: 'Mijn Afspraken',
+        activeAppointmentsTitle: 'Actieve afspraken',
+        historyTitle: 'Historiek',
         managerTitle: 'Manager Tools',
         incomingWorkTitle: 'Binnenkomend werk',
         incomingEmpty: 'Geen binnenkomend werk.',
@@ -408,9 +401,8 @@
         noAccounts: 'Nog geen accountgegevens.',
         loading: 'Laden...',
         noActive: 'Geen actieve afspraak.',
-        noAppointments: 'Nog geen afspraken gevonden.',
-        noUpcoming: 'Geen komende afspraken.',
-        noSchedule: 'Geen bevestigde slots.',
+        noAppointments: 'Nog geen actieve afspraken.',
+        noHistory: 'Nog geen afgeronde afspraken.',
         loyaltyLine: '{stamps} sticker(s), {rewards} reward(s) beschikbaar. Elke 5 stickers = 25% korting op je volgende nazicht/check-up.',
         voucherTitle: 'Beschikbare vouchers:',
         voucherEmpty: 'Nog geen voucher actief.',
@@ -434,6 +426,10 @@
         statusConfirmed: 'Bevestigd',
         statusCompleted: 'Afgerond',
         statusDeclined: 'Geweigerd',
+        invoiceLink: 'Factuurlink',
+        mechanicNotes: 'Notities mecanicien',
+        partsReplaced: 'Vervangen onderdelen',
+        incomingSummary: 'Pending: {pending} | Confirmed: {confirmed} | In progress: {inProgress}',
         invalidSession: 'Sessie verlopen. Log opnieuw in.',
         tempLoadError: 'Tijdelijke laadfout. Probeer opnieuw.'
       },
@@ -445,9 +441,8 @@
         logoutBtn: 'Logout',
         profileTitle: 'My Profile',
         loyaltyTitle: 'Loyalty (Stamps)',
-        upcomingTitle: 'Upcoming appointments',
-        upcomingScheduleTitle: 'Upcoming schedule',
-        appointmentsTitle: 'My Appointments',
+        activeAppointmentsTitle: 'Active appointments',
+        historyTitle: 'Completed history',
         managerTitle: 'Manager Tools',
         incomingWorkTitle: 'Incoming work',
         incomingEmpty: 'No incoming work.',
@@ -462,9 +457,8 @@
         noAccounts: 'No account records yet.',
         loading: 'Loading...',
         noActive: 'No active appointment.',
-        noAppointments: 'No appointments found yet.',
-        noUpcoming: 'No upcoming appointments.',
-        noSchedule: 'No confirmed slots.',
+        noAppointments: 'No active appointments yet.',
+        noHistory: 'No completed appointments yet.',
         loyaltyLine: '{stamps} stamp(s), {rewards} reward(s) available. Every 5 stamps = 25% off your next inspection/check-up.',
         voucherTitle: 'Available vouchers:',
         voucherEmpty: 'No active voucher yet.',
@@ -488,6 +482,10 @@
         statusConfirmed: 'Confirmed',
         statusCompleted: 'Completed',
         statusDeclined: 'Declined',
+        invoiceLink: 'Invoice link',
+        mechanicNotes: 'Mechanic notes',
+        partsReplaced: 'Parts replaced',
+        incomingSummary: 'Pending: {pending} | Confirmed: {confirmed} | In progress: {inProgress}',
         invalidSession: 'Session expired. Please log in again.',
         tempLoadError: 'Temporary load error. Please retry.'
       },
@@ -496,42 +494,40 @@
         websiteBtn: 'Site',
         statusPageBtn: 'Live Status',
         profileBtn: 'Profil',
-        logoutBtn: 'Se dÃ©connecter',
+        logoutBtn: 'Se déconnecter',
         profileTitle: 'Mon Profil',
-        loyaltyTitle: 'FidÃ©litÃ© (Stickers)',
-        upcomingTitle: 'Rendez-vous a venir',
-        upcomingScheduleTitle: 'Planning a venir',
-        appointmentsTitle: 'Mes Rendez-vous',
+        loyaltyTitle: 'Fidélité (Stickers)',
+        activeAppointmentsTitle: 'Rendez-vous actifs',
+        historyTitle: 'Historique des interventions',
         managerTitle: 'Outils Manager',
         incomingWorkTitle: 'Travaux entrants',
         incomingEmpty: 'Aucun travail entrant.',
-        manageBtn: 'Gerer',
+        manageBtn: 'Gérer',
         openManagerPage: 'Ouvrir page statut',
         grantBtn: 'Donner sticker(s)',
-        statusUpdateBtn: 'Mettre a jour statut',
-        grantOk: 'Sticker(s) attribuÃ©(s).',
-        grantFail: 'Attribution Ã©chouÃ©e.',
-        statusUpdateOk: 'Statut de reparation mis a jour.',
-        statusUpdateFail: 'Echec mise a jour statut.',
-        noAccounts: 'Aucun compte enregistrÃ©.',
+        statusUpdateBtn: 'Mettre à jour le statut',
+        grantOk: 'Sticker(s) attribué(s).',
+        grantFail: 'Attribution échouée.',
+        statusUpdateOk: 'Statut de réparation mis à jour.',
+        statusUpdateFail: 'Échec de mise à jour du statut.',
+        noAccounts: 'Aucun compte enregistré.',
         loading: 'Chargement...',
         noActive: 'Aucun rendez-vous actif.',
-        noAppointments: 'Aucun rendez-vous trouvÃ©.',
-        noUpcoming: 'Aucun rendez-vous a venir.',
-        noSchedule: 'Aucun slot confirme.',
-        loyaltyLine: '{stamps} sticker(s), {rewards} rÃ©compense(s) disponible(s). Chaque 5 stickers = 25% de rÃ©duction sur votre prochain contrÃ´le/check-up.',
+        noAppointments: 'Aucun rendez-vous actif.',
+        noHistory: 'Aucun rendez-vous terminé.',
+        loyaltyLine: '{stamps} sticker(s), {rewards} récompense(s) disponible(s). Tous les 5 stickers = 25% de réduction sur votre prochain contrôle/check-up.',
         voucherTitle: 'Bons disponibles :',
         voucherEmpty: 'Aucun bon actif.',
-        voucherText: '{code} - {discount}% rÃ©duction ({scope})',
+        voucherText: '{code} - {discount}% réduction ({scope})',
         voucherUseBtn: 'Utiliser',
-        voucherRedeemOk: 'Bon utilisÃ©.',
-        voucherRedeemFail: 'Echec utilisation bon.',
+        voucherRedeemOk: 'Bon utilisé.',
+        voucherRedeemFail: 'Échec d utilisation du bon.',
         profileLine: '{name} ({email})',
-        lastLogin: 'DerniÃ¨re connexion : {value}',
-        createdAt: 'CrÃ©Ã©',
+        lastLogin: 'Dernière connexion : {value}',
+        createdAt: 'Créé',
         date: 'Date',
         jobId: 'ID Job',
-        vehicle: 'VÃ©hicule',
+        vehicle: 'Véhicule',
         time: 'Heure',
         language: 'Langue',
         timezone: 'Fuseau',
@@ -539,11 +535,15 @@
         serviceDefault: 'Service',
         unknownStatus: 'INCONNU',
         statusPending: 'En attente',
-        statusConfirmed: 'Confirme',
-        statusCompleted: 'Termine',
-        statusDeclined: 'Refuse',
-        invalidSession: 'Session expirÃ©e. Reconnectez-vous.',
-        tempLoadError: 'Erreur temporaire. RÃ©essayez.'
+        statusConfirmed: 'Confirmé',
+        statusCompleted: 'Terminé',
+        statusDeclined: 'Refusé',
+        invoiceLink: 'Lien facture',
+        mechanicNotes: 'Notes du mécanicien',
+        partsReplaced: 'Pièces remplacées',
+        incomingSummary: 'En attente : {pending} | Confirmés : {confirmed} | En cours : {inProgress}',
+        invalidSession: 'Session expirée. Reconnectez-vous.',
+        tempLoadError: 'Erreur temporaire. Réessayez.'
       }
     };
     let currentLang = localStorage.getItem('ace_lang') || 'nl';
@@ -553,11 +553,9 @@
     const loyaltyLine = document.getElementById('loyaltyLine');
     const stampGrid = document.getElementById('stampGrid');
     const appointmentsList = document.getElementById('appointmentsList');
-    const upcomingAppointmentsList = document.getElementById('upcomingAppointmentsList');
-    const upcomingScheduleList = document.getElementById('upcomingScheduleList');
-    const upcomingScheduleCard = document.getElementById('upcomingScheduleCard');
-    const upcomingUserCard = document.getElementById('upcomingUserCard');
     const appointmentsUserCard = document.getElementById('appointmentsUserCard');
+    const historyCard = document.getElementById('historyCard');
+    const historyList = document.getElementById('historyList');
     const voucherList = document.getElementById('voucherList');
     const logoutBtn = document.getElementById('logoutBtn');
     const managerCard = document.getElementById('managerCard');
@@ -571,6 +569,7 @@
     const managerMsg = document.getElementById('managerMsg');
     const managerAccountsList = document.getElementById('managerAccountsList');
     const incomingWorkList = document.getElementById('incomingWorkList');
+    const incomingWorkSummary = document.getElementById('incomingWorkSummary');
     let lastDashboardData = null;
     const t = (key) => {
       const langPack = translations[currentLang] || {};
@@ -747,29 +746,23 @@
         });
       });
     };
-    const renderUpcomingAppointments = (items) => {
+    const renderHistory = (items) => {
       if (!Array.isArray(items) || items.length === 0) {
-        upcomingAppointmentsList.innerHTML = `<li class="list-item muted">${t('noUpcoming')}</li>`;
+        historyList.innerHTML = `<li class="list-item muted">${t('noHistory')}</li>`;
         return;
       }
-      upcomingAppointmentsList.innerHTML = items.map((a) => `
+      historyList.innerHTML = items.map((a) => `
         <li class="list-item">
-          <div class="line"><strong>${a.service || t('serviceDefault')}</strong><span>${a.preferred_date || '-'}</span></div>
+          <div class="line">
+            <strong>${a.service || t('serviceDefault')}</strong>
+            <span class="status-pill ${statusClass(a.status)}">${statusLabel(a.status)}</span>
+          </div>
           <div class="line"><span>${t('jobId')}</span><span>${a.id || '-'}</span></div>
+          <div class="line"><span>${t('date')}</span><span>${a.preferred_date || '-'}</span></div>
           <div class="line"><span>${t('vehicle')}</span><span>${a.vehicle || '-'}</span></div>
-        </li>
-      `).join('');
-    };
-    const renderUpcomingSchedule = (items) => {
-      if (!Array.isArray(items) || items.length === 0) {
-        upcomingScheduleList.innerHTML = `<li class="list-item muted">${t('noSchedule')}</li>`;
-        return;
-      }
-      upcomingScheduleList.innerHTML = items.map((a) => `
-        <li class="list-item">
-          <div class="line"><strong>${a.service || t('serviceDefault')}</strong><span>${a.preferred_date || '-'}</span></div>
-          <div class="line"><span>${t('jobId')}</span><span>${a.id || '-'}</span></div>
-          <div class="line"><span>${t('vehicle')}</span><span>${a.vehicle || '-'}</span></div>
+          <div class="line"><span>${t('invoiceLink')}</span><span>${a.invoice_link ? `<a class="btn" href="${a.invoice_link}" target="_blank" rel="noopener noreferrer">Open</a>` : '-'}</span></div>
+          <div class="line"><span>${t('mechanicNotes')}</span><span>${a.mechanic_notes || '-'}</span></div>
+          <div class="line"><span>${t('partsReplaced')}</span><span>${a.parts_replaced || '-'}</span></div>
         </li>
       `).join('');
     };
@@ -790,6 +783,10 @@
       const list = Array.isArray(items) ? items : [];
       if (!list.length) {
         incomingWorkList.innerHTML = `<li class="list-item muted">${t('incomingEmpty')}</li>`;
+        incomingWorkSummary.textContent = t('incomingSummary')
+          .replace('{pending}', '0')
+          .replace('{confirmed}', '0')
+          .replace('{inProgress}', '0');
         return;
       }
       incomingWorkList.innerHTML = list.map((a) => {
@@ -827,23 +824,38 @@
       renderStamps(loyalty);
       renderVouchers(vouchers);
 
-      renderUpcomingAppointments(data.upcoming_appointments || []);
-      renderUpcomingSchedule(data.upcoming_schedule || []);
-      renderAppointments(data.appointments || []);
+      renderAppointments(data.active_appointments || data.appointments || []);
+      renderHistory(data.completed_appointments || []);
       if (data.user?.role === 'manager') {
         managerCard.style.display = 'block';
-        upcomingUserCard.style.display = 'none';
-        upcomingScheduleCard.style.display = 'none';
         appointmentsUserCard.style.display = 'none';
+        historyCard.style.display = 'none';
         renderManagerAccounts(data.manager_tools?.accounts || []);
         renderIncomingWork(data.manager_tools?.incoming_work || []);
+        const summary = data.manager_tools?.incoming_summary || {};
+        incomingWorkSummary.textContent = t('incomingSummary')
+          .replace('{pending}', String(summary.pending || 0))
+          .replace('{confirmed}', String(summary.confirmed || 0))
+          .replace('{inProgress}', String(summary.in_progress || 0));
       } else {
         managerCard.style.display = 'none';
-        upcomingUserCard.style.display = 'block';
-        upcomingScheduleCard.style.display = 'block';
         appointmentsUserCard.style.display = 'block';
+        historyCard.style.display = 'block';
       }
     };
+
+    try {
+      const cachedText = localStorage.getItem(dashboardCacheKey);
+      if (cachedText) {
+        const cached = JSON.parse(cachedText);
+        if (cached && cached.ok) {
+          lastDashboardData = cached;
+          render(cached);
+        }
+      }
+    } catch (_err) {
+      // Ignore cache parsing errors and continue with live fetch.
+    }
 
     fetchDashboard()
       .then((data) => {
@@ -861,19 +873,6 @@
           setTimeout(() => { window.location.href = 'account.html'; }, 1200);
         }
       });
-
-    try {
-      const cachedText = localStorage.getItem(dashboardCacheKey);
-      if (cachedText) {
-        const cached = JSON.parse(cachedText);
-        if (cached && cached.ok) {
-          lastDashboardData = cached;
-          render(cached);
-        }
-      }
-    } catch (_err) {
-      // Ignore cache parsing errors and continue with live fetch.
-    }
 
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('ace_portal_token');

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
@@ -18,6 +18,10 @@
     .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
     .list{list-style:none;padding:0;margin:0;display:grid;gap:10px}.item{border:1px solid var(--border);border-radius:10px;padding:10px;background:rgba(255,255,255,.02)}
     .line{display:flex;justify-content:space-between;gap:8px;align-items:center}.muted{color:var(--muted)}
+    .selected-job{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.03)}
+    .selected-job strong{font-size:.88rem}
+    .selected-job .job-value{font-size:.86rem;color:#f5f7ff}
+    .selected-job .copy-btn{border:1px solid var(--border);background:rgba(255,255,255,.02);border-radius:999px;padding:6px 10px;min-height:auto;font-size:.75rem}
     .status-pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid transparent;font-size:.74rem;font-weight:700}
     .status-pill.pending{color:#f1bc53;border-color:rgba(241,188,83,.45)} .status-pill.confirmed{color:#4ec786;border-color:rgba(78,199,134,.45)}
     .status-pill.completed{color:#f5f7ff;border-color:rgba(199,204,211,.45)} .status-pill.declined{color:#ff9f9f;border-color:rgba(255,85,85,.45)}
@@ -36,8 +40,13 @@
   <main>
     <div class="container grid">
       <section class="card">
-        <h2 data-i18n="todayTitle">Schedule today</h2>
-        <ul class="list" id="todayList"></ul>
+        <div class="selected-job">
+          <div>
+            <strong data-i18n="selectedJobTitle">Selected job</strong>
+            <div class="job-value" id="selectedJobValue">-</div>
+          </div>
+          <button type="button" class="copy-btn" id="copyJobBtn" data-i18n="copyIdBtn">Copy ID</button>
+        </div>
         <h2 data-i18n="incomingTitle">Incoming work</h2>
         <ul class="list" id="incomingList"></ul>
       </section>
@@ -68,6 +77,14 @@
           <button type="button" class="next-btn" id="nextStageBtn" data-i18n="nextBtn">Next stage</button>
           <button type="submit" data-i18n="saveBtn">Save status</button>
         </form>
+        <h2 style="margin-top:14px" data-i18n="docsTitle">Completion documentation</h2>
+        <form id="docsForm">
+          <div class="field"><label for="invoiceLink" data-i18n="invoiceLink">Invoice link</label><input id="invoiceLink" type="url" placeholder="https://..." /></div>
+          <div class="field"><label for="mechanicNotes" data-i18n="mechanicNotes">Mechanic notes</label><input id="mechanicNotes" type="text" /></div>
+          <div class="field"><label for="partsReplaced" data-i18n="partsReplaced">Parts replaced</label><input id="partsReplaced" type="text" /></div>
+          <button type="button" id="loadDocsBtn" data-i18n="loadDocsBtn">Load docs</button>
+          <button type="submit" data-i18n="saveDocsBtn">Save docs</button>
+        </form>
         <p class="msg" id="msg"></p>
       </section>
     </div>
@@ -79,14 +96,13 @@
     const q = new URLSearchParams(window.location.search);
 
     const translations = {
-      nl: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', todayTitle:'Planning vandaag', incomingTitle:'Binnenkomend werk', editTitle:'Status updaten', jobId:'Job ID', email:'Klant e-mail', stage:'Fase', quickTitle:'Snelle acties', nextBtn:'Volgende fase', saveBtn:'Status opslaan', noItems:'Geen items.', loading:'Laden...', saved:'Status opgeslagen.', fail:'Update mislukt.', statusPending:'In afwachting', statusConfirmed:'Bevestigd', statusInProgress:'Bezig', statusCompleted:'Afgerond', open:'Open', stage_appointment_confirmed:'Afspraak bevestigd', stage_diagnostic:'Diagnose', stage_in_repair:'In herstelling', stage_quality_check:'Kwaliteitscontrole', stage_ready_for_pickup:'Klaar voor ophaling' },
-      en: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', todayTitle:'Schedule today', incomingTitle:'Incoming work', editTitle:'Update status', jobId:'Job ID', email:'Customer email', stage:'Stage', quickTitle:'Quick actions', nextBtn:'Next stage', saveBtn:'Save status', noItems:'No items.', loading:'Loading...', saved:'Status saved.', fail:'Update failed.', statusPending:'Pending', statusConfirmed:'Confirmed', statusInProgress:'In progress', statusCompleted:'Completed', open:'Open', stage_appointment_confirmed:'Appointment confirmed', stage_diagnostic:'Diagnostic', stage_in_repair:'In repair', stage_quality_check:'Quality check', stage_ready_for_pickup:'Ready for pickup' },
-      fr: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', todayTitle:'Planning aujourd hui', incomingTitle:'Travaux entrants', editTitle:'Mettre a jour statut', jobId:'ID Job', email:'E-mail client', stage:'Etape', quickTitle:'Actions rapides', nextBtn:'Etape suivante', saveBtn:'Enregistrer statut', noItems:'Aucun element.', loading:'Chargement...', saved:'Statut enregistre.', fail:'Echec mise a jour.', statusPending:'En attente', statusConfirmed:'Confirme', statusInProgress:'En cours', statusCompleted:'Termine', open:'Ouvrir', stage_appointment_confirmed:'Rendez-vous confirme', stage_diagnostic:'Diagnostic', stage_in_repair:'En reparation', stage_quality_check:'Controle qualite', stage_ready_for_pickup:'Pret pour retrait' }
+      nl: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', incomingTitle:'Binnenkomend werk', editTitle:'Status updaten', docsTitle:'Voltooiingsdocumentatie', selectedJobTitle:'Geselecteerde job', copyIdBtn:'Kopieer ID', idCopied:'Job ID gekopieerd.', noSelectedJob:'Geen job geselecteerd.', jobId:'Job ID', email:'Klant e-mail', stage:'Fase', quickTitle:'Snelle acties', nextBtn:'Volgende fase', saveBtn:'Status opslaan', invoiceLink:'Factuurlink', mechanicNotes:'Notities mecanicien', partsReplaced:'Vervangen onderdelen', loadDocsBtn:'Laad docs', saveDocsBtn:'Sla docs op', noItems:'Geen items.', loading:'Laden...', saved:'Status opgeslagen.', docsSaved:'Documentatie opgeslagen.', fail:'Update mislukt.', movedDone:'Afspraak afgerond en verplaatst naar historiek.', statusPending:'In afwachting', statusConfirmed:'Bevestigd', statusInProgress:'Bezig', statusCompleted:'Afgerond', open:'Open', stage_appointment_confirmed:'Afspraak bevestigd', stage_diagnostic:'Diagnose', stage_in_repair:'In herstelling', stage_quality_check:'Kwaliteitscontrole', stage_ready_for_pickup:'Klaar voor ophaling' },
+      en: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', incomingTitle:'Incoming work', editTitle:'Update status', docsTitle:'Completion documentation', selectedJobTitle:'Selected job', copyIdBtn:'Copy ID', idCopied:'Job ID copied.', noSelectedJob:'No job selected.', jobId:'Job ID', email:'Customer email', stage:'Stage', quickTitle:'Quick actions', nextBtn:'Next stage', saveBtn:'Save status', invoiceLink:'Invoice link', mechanicNotes:'Mechanic notes', partsReplaced:'Parts replaced', loadDocsBtn:'Load docs', saveDocsBtn:'Save docs', noItems:'No items.', loading:'Loading...', saved:'Status saved.', docsSaved:'Documentation saved.', fail:'Update failed.', movedDone:'Appointment completed and moved to history.', statusPending:'Pending', statusConfirmed:'Confirmed', statusInProgress:'In progress', statusCompleted:'Completed', open:'Open', stage_appointment_confirmed:'Appointment confirmed', stage_diagnostic:'Diagnostic', stage_in_repair:'In repair', stage_quality_check:'Quality check', stage_ready_for_pickup:'Ready for pickup' },
+      fr: { pageTitle:'ACE | Manager Work', dashboardBtn:'Dashboard', incomingTitle:'Travaux entrants', editTitle:'Mettre à jour statut', docsTitle:'Documentation de clôture', selectedJobTitle:'Job sélectionné', copyIdBtn:'Copier ID', idCopied:'ID du job copié.', noSelectedJob:'Aucun job sélectionné.', jobId:'ID Job', email:'E-mail client', stage:'Étape', quickTitle:'Actions rapides', nextBtn:'Étape suivante', saveBtn:'Enregistrer statut', invoiceLink:'Lien de facture', mechanicNotes:'Notes du mécanicien', partsReplaced:'Pièces remplacées', loadDocsBtn:'Charger docs', saveDocsBtn:'Enregistrer docs', noItems:'Aucun élément.', loading:'Chargement...', saved:'Statut enregistré.', docsSaved:'Documentation enregistrée.', fail:'Échec mise à jour.', movedDone:'Rendez-vous terminé et déplacé vers l’historique.', statusPending:'En attente', statusConfirmed:'Confirmé', statusInProgress:'En cours', statusCompleted:'Terminé', open:'Ouvrir', stage_appointment_confirmed:'Rendez-vous confirmé', stage_diagnostic:'Diagnostic', stage_in_repair:'En réparation', stage_quality_check:'Contrôle qualité', stage_ready_for_pickup:'Prêt pour retrait' }
     };
     const STAGE_ORDER = ['appointment_confirmed', 'diagnostic', 'in_repair', 'quality_check', 'ready_for_pickup'];
     let currentLang = localStorage.getItem('ace_lang') || 'nl';
     const t = (k) => (translations[currentLang] || translations.nl)[k] || translations.nl[k] || '';
-    const todayList = document.getElementById('todayList');
     const incomingList = document.getElementById('incomingList');
     const form = document.getElementById('statusForm');
     const jobId = document.getElementById('jobId');
@@ -94,15 +110,28 @@
     const stage = document.getElementById('stage');
     const quickActions = document.getElementById('quickActions');
     const nextStageBtn = document.getElementById('nextStageBtn');
+    const docsForm = document.getElementById('docsForm');
+    const loadDocsBtn = document.getElementById('loadDocsBtn');
+    const invoiceLink = document.getElementById('invoiceLink');
+    const mechanicNotes = document.getElementById('mechanicNotes');
+    const partsReplaced = document.getElementById('partsReplaced');
     const msg = document.getElementById('msg');
+    const selectedJobValue = document.getElementById('selectedJobValue');
+    const copyJobBtn = document.getElementById('copyJobBtn');
     let lastIncoming = [];
+    let selectedJobId = '';
 
     const setMessage = (text, err) => { msg.textContent = text || ''; msg.style.color = err ? '#ff9f9f' : '#a6b0bc'; };
+    const updateSelectedJobUi = () => {
+      const value = String(jobId.value || selectedJobId || '').trim();
+      selectedJobValue.textContent = value || t('noSelectedJob');
+    };
     const statusClass = (s) => { const v = String(s || '').toUpperCase(); if (v === 'PENDING') return 'pending'; if (v === 'CONFIRMED') return 'confirmed'; if (v === 'IN_PROGRESS') return 'confirmed'; if (v === 'COMPLETED') return 'completed'; return 'declined'; };
     const statusLabel = (s) => { const v = String(s || '').toUpperCase(); if (v === 'PENDING') return t('statusPending'); if (v === 'CONFIRMED') return t('statusConfirmed'); if (v === 'IN_PROGRESS') return t('statusInProgress'); if (v === 'COMPLETED') return t('statusCompleted'); return v || '-'; };
-    const todayIso = () => { const d = new Date(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); return `${d.getFullYear()}-${m}-${day}`; };
     const mapIncomingToStage = (status) => {
       const s = String(status || '').toUpperCase();
+      if (s === 'PENDING' || s === 'CONFIRMED') return 'appointment_confirmed';
+      if (s === 'IN_PROGRESS') return 'in_repair';
       if (s === 'COMPLETED') return 'ready_for_pickup';
       return 'appointment_confirmed';
     };
@@ -119,12 +148,16 @@
         })
         .catch(() => {});
     };
-    const openItem = (a) => {
+    const openItem = (a, options = {}) => {
+      const opts = options && typeof options === 'object' ? options : {};
+      selectedJobId = String(a.id || '');
       jobId.value = String(a.id || '');
       email.value = String(a.email || '');
       stage.value = mapIncomingToStage(a.status);
-      loadCurrentRepairStage(String(a.id || ''), String(a.email || ''));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (opts.loadStage !== false) loadCurrentRepairStage(String(a.id || ''), String(a.email || ''));
+      if (opts.loadDocs !== false) loadDocs();
+      if (opts.scroll !== false) window.scrollTo({ top: 0, behavior: 'smooth' });
+      updateSelectedJobUi();
     };
     const renderList = (el, items) => {
       if (!items.length) { el.innerHTML = `<li class="item muted">${t('noItems')}</li>`; return; }
@@ -143,9 +176,8 @@
         btn.textContent = t(`stage_${key}`) || key;
       });
       document.querySelectorAll('.lang-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.lang === currentLang));
-      const today = lastIncoming.filter((a) => a.preferred_date === todayIso());
-      renderList(todayList, today);
       renderList(incomingList, lastIncoming);
+      updateSelectedJobUi();
     };
     document.querySelectorAll('.lang-btn').forEach((btn) => btn.addEventListener('click', () => applyLanguage(btn.dataset.lang)));
 
@@ -154,6 +186,22 @@
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data?.ok !== true) throw new Error(data?.error || 'Request failed');
       return data;
+    };
+    const loadDocs = () => {
+      const id = String(jobId.value || '').trim();
+      if (!id) return;
+      setMessage(t('loading'));
+      postApi({ action: 'get_appointment_details', token, job_id: id })
+        .then((data) => {
+          const appt = data.appointment || {};
+          if (String(appt.email || '').trim()) email.value = String(appt.email || '');
+          if (String(appt.status || '').trim()) stage.value = mapIncomingToStage(appt.status);
+          invoiceLink.value = String(appt.invoice_link || '');
+          mechanicNotes.value = String(appt.mechanic_notes || '');
+          partsReplaced.value = String(appt.parts_replaced || '');
+          setMessage('');
+        })
+        .catch(() => setMessage(t('fail'), true));
     };
     const updateStatus = (targetStage) => {
       setMessage(t('loading'));
@@ -164,19 +212,45 @@
         customer_email: String(email.value || '').trim(),
         currentStatus: String(targetStage || stage.value || '').trim()
       })
-        .then(() => { stage.value = String(targetStage || stage.value || ''); setMessage(t('saved')); load(); })
+        .then(() => {
+          stage.value = String(targetStage || stage.value || '');
+          const done = stage.value === 'ready_for_pickup';
+          setMessage(done ? t('movedDone') : t('saved'));
+          load();
+        })
         .catch(() => setMessage(t('fail'), true));
     };
     const load = () => {
       setMessage(t('loading'));
-      postApi({ action: 'dashboard', token })
+      const queryJobId = String(q.get('job_id') || '').trim();
+      postApi({ action: 'manager_incoming', token, job_id: queryJobId || undefined })
         .then((data) => {
-          if (String(data?.user?.role || '') !== 'manager') throw new Error('No access');
-          lastIncoming = Array.isArray(data?.manager_tools?.incoming_work) ? data.manager_tools.incoming_work : [];
-          if (q.get('job_id')) jobId.value = q.get('job_id');
-          if (q.get('email')) email.value = q.get('email');
+          let nextMessage = '';
+          let list = Array.isArray(data?.incoming_work) ? data.incoming_work : [];
+          const queryEmail = String(q.get('email') || '').trim();
+          if (queryJobId) {
+            list = list.filter((item) => String(item.id || '').trim() === queryJobId);
+          }
+          lastIncoming = list;
+          if (queryJobId) {
+            selectedJobId = queryJobId;
+            jobId.value = queryJobId;
+          }
+          if (queryEmail) email.value = queryEmail;
+          if (selectedJobId) {
+            const selected = lastIncoming.find((item) => String(item.id || '').trim() === selectedJobId);
+            if (selected) {
+              openItem(selected, { scroll: false, loadDocs: false, loadStage: false });
+            } else if (queryJobId) {
+              nextMessage = t('movedDone');
+              jobId.value = queryJobId;
+              updateSelectedJobUi();
+            }
+          } else if (lastIncoming.length === 1) {
+            openItem(lastIncoming[0], { scroll: false });
+          }
           applyLanguage(currentLang);
-          setMessage('');
+          setMessage(nextMessage);
         })
         .catch((err) => {
           const text = String(err?.message || '');
@@ -193,6 +267,40 @@
       event.preventDefault();
       updateStatus(String(stage.value || '').trim());
     });
+    jobId.addEventListener('input', () => {
+      selectedJobId = String(jobId.value || '').trim();
+      updateSelectedJobUi();
+    });
+    copyJobBtn.addEventListener('click', async () => {
+      const value = String(jobId.value || selectedJobId || '').trim();
+      if (!value) {
+        setMessage(t('noSelectedJob'), true);
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(value);
+        setMessage(t('idCopied'));
+      } catch (_err) {
+        setMessage(value);
+      }
+    });
+    loadDocsBtn.addEventListener('click', loadDocs);
+    docsForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const id = String(jobId.value || '').trim();
+      if (!id) return;
+      setMessage(t('loading'));
+      postApi({
+        action: 'update_appointment_docs',
+        token,
+        job_id: id,
+        invoice_link: String(invoiceLink.value || '').trim(),
+        mechanic_notes: String(mechanicNotes.value || '').trim(),
+        parts_replaced: String(partsReplaced.value || '').trim()
+      })
+        .then(() => setMessage(t('docsSaved')))
+        .catch(() => setMessage(t('fail'), true));
+    });
     quickActions.querySelectorAll('button[data-stage]').forEach((btn) => {
       btn.addEventListener('click', () => updateStatus(String(btn.dataset.stage || '').trim()));
     });
@@ -202,6 +310,7 @@
       const next = idx >= 0 && idx < STAGE_ORDER.length - 1 ? STAGE_ORDER[idx + 1] : STAGE_ORDER[STAGE_ORDER.length - 1];
       updateStatus(next);
     });
+    updateSelectedJobUi();
     load();
   </script>
 </body>

@@ -36,6 +36,9 @@
     main { padding: 24px 0 40px; }
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
     .card h2 { margin: 0 0 12px; font-size: 1.1rem; }
+    .selector { margin-bottom: 12px; display: grid; gap: 6px; }
+    .selector label { font-size: 0.84rem; color: var(--muted); font-weight: 600; }
+    .selector select { width: 100%; border: 1px solid var(--border); border-radius: 10px; background: rgba(255,255,255,0.02); color: var(--text); padding: 10px 12px; font: inherit; min-height: 42px; }
     .tracker-wrap { overflow-x: auto; padding-bottom: 4px; }
     .tracker-row { min-width: 760px; display: flex; align-items: center; gap: 8px; }
     .tracker-step { flex: 1; min-width: 130px; text-align: center; }
@@ -90,6 +93,10 @@
     <div class="container">
       <section class="card">
         <h2 data-i18n="title">Repair Progress Tracker</h2>
+        <div class="selector" id="appointmentSelectorWrap" style="display:none">
+          <label for="appointmentSelector" data-i18n="selectAppointment">Select appointment</label>
+          <select id="appointmentSelector"></select>
+        </div>
         <div class="tracker-wrap"><div class="tracker-row" id="repairTracker"></div></div>
         <div class="live-update">
           <h3 data-i18n="liveUpdateTitle">Live Update</h3>
@@ -107,7 +114,10 @@
     if (!token) window.location.href = 'account.html';
 
     const trackerCacheKey = 'ace_live_status_cache_v1';
+    const trackerSelectionKey = 'ace_live_status_selected_job';
     const repairTracker = document.getElementById('repairTracker');
+    const appointmentSelectorWrap = document.getElementById('appointmentSelectorWrap');
+    const appointmentSelector = document.getElementById('appointmentSelector');
     const liveUpdateMessage = document.getElementById('liveUpdateMessage');
     const liveUpdateTs = document.getElementById('liveUpdateTs');
     const statusMeta = document.getElementById('statusMeta');
@@ -122,15 +132,16 @@
     let remoteStatusI18n = null;
 
     const translations = {
-      nl: { pageTitle: 'ACE Car Repair | Live Status', backDashboard: 'Dashboard', websiteBtn: 'Website', title: 'Repair Progress Tracker', liveUpdateTitle: 'Live Update', no_appointment: 'Geen afspraak ingepland', no_appointment_msg: 'Er is nog geen actieve afspraak ingepland.', appointment_confirmed: 'Afspraak bevestigd', diagnostic: 'Diagnose', in_repair: 'In herstelling', quality_check: 'Kwaliteitscontrole', ready_for_pickup: 'Klaar voor ophaling', appointment_confirmed_msg: 'Je afspraak is bevestigd. We staan klaar om je wagen te ontvangen.', diagnostic_msg: 'Onze technieker voert momenteel een gerichte diagnose uit.', in_repair_msg: 'Onze technieker is je wagen nauwkeurig aan het herstellen. Alles loopt op schema.', quality_check_msg: 'Je wagen zit in kwaliteitscontrole voor finale vrijgave.', ready_for_pickup_msg: 'Goed nieuws: je wagen is klaar voor ophaling.', noData: 'Nog geen repair status gevonden.', dateLabel: 'Datum', time: 'Laatste update', meta: '{service} | {vehicle} | {dateLabel}: {date}' },
-      en: { pageTitle: 'ACE Car Repair | Live Status', backDashboard: 'Dashboard', websiteBtn: 'Website', title: 'Repair Progress Tracker', liveUpdateTitle: 'Live Update', no_appointment: 'No appointment scheduled', no_appointment_msg: 'There is no active appointment scheduled yet.', appointment_confirmed: 'Appointment confirmed', diagnostic: 'Diagnostic', in_repair: 'In repair', quality_check: 'Quality check', ready_for_pickup: 'Ready for pickup', appointment_confirmed_msg: 'Your appointment is confirmed. We are ready to receive your car.', diagnostic_msg: 'Our technician is currently running a focused diagnostic.', in_repair_msg: 'Our technician is carefully repairing your vehicle. Everything is on schedule.', quality_check_msg: 'Your vehicle is in final quality control before release.', ready_for_pickup_msg: 'Great news: your vehicle is ready for pickup.', noData: 'No repair status found yet.', dateLabel: 'Date', time: 'Last update', meta: '{service} | {vehicle} | {dateLabel}: {date}' },
-      fr: { pageTitle: 'ACE Car Repair | Live Status', backDashboard: 'Dashboard', websiteBtn: 'Site', title: 'Repair Progress Tracker', liveUpdateTitle: 'Live Update', no_appointment: 'Aucun rendez-vous planifie', no_appointment_msg: 'Aucun rendez-vous actif n est planifie pour le moment.', appointment_confirmed: 'Rendez-vous confirme', diagnostic: 'Diagnostic', in_repair: 'En reparation', quality_check: 'Controle qualite', ready_for_pickup: 'Pret pour retrait', appointment_confirmed_msg: 'Votre rendez-vous est confirme. Nous sommes prets a recevoir votre vehicule.', diagnostic_msg: 'Notre technicien effectue actuellement un diagnostic precis.', in_repair_msg: 'Notre technicien repare votre vehicule avec precision. Nous sommes dans les delais.', quality_check_msg: 'Votre vehicule est en controle qualite final avant remise.', ready_for_pickup_msg: 'Bonne nouvelle: votre vehicule est pret pour le retrait.', noData: 'Aucun statut trouve pour le moment.', dateLabel: 'Date', time: 'Derniere mise a jour', meta: '{service} | {vehicle} | {dateLabel}: {date}' }
+      nl: { pageTitle: 'ACE Car Repair | Live Status', backDashboard: 'Dashboard', websiteBtn: 'Website', title: 'Repair Progress Tracker', liveUpdateTitle: 'Live Update', selectAppointment: 'Kies afspraak', no_appointment: 'Geen afspraak ingepland', no_appointment_msg: 'Er is nog geen actieve afspraak ingepland.', appointment_confirmed: 'Afspraak bevestigd', diagnostic: 'Diagnose', in_repair: 'In herstelling', quality_check: 'Kwaliteitscontrole', ready_for_pickup: 'Klaar voor ophaling', appointment_confirmed_msg: 'Je afspraak is bevestigd. We staan klaar om je wagen te ontvangen.', diagnostic_msg: 'Onze technieker voert momenteel een gerichte diagnose uit.', in_repair_msg: 'Onze technieker is je wagen nauwkeurig aan het herstellen. Alles loopt op schema.', quality_check_msg: 'Je wagen zit in kwaliteitscontrole voor finale vrijgave.', ready_for_pickup_msg: 'Goed nieuws: je wagen is klaar voor ophaling.', noData: 'Nog geen repair status gevonden.', dateLabel: 'Datum', time: 'Laatste update', meta: '{service} | {vehicle} | {dateLabel}: {date}' },
+      en: { pageTitle: 'ACE Car Repair | Live Status', backDashboard: 'Dashboard', websiteBtn: 'Website', title: 'Repair Progress Tracker', liveUpdateTitle: 'Live Update', selectAppointment: 'Select appointment', no_appointment: 'No appointment scheduled', no_appointment_msg: 'There is no active appointment scheduled yet.', appointment_confirmed: 'Appointment confirmed', diagnostic: 'Diagnostic', in_repair: 'In repair', quality_check: 'Quality check', ready_for_pickup: 'Ready for pickup', appointment_confirmed_msg: 'Your appointment is confirmed. We are ready to receive your car.', diagnostic_msg: 'Our technician is currently running a focused diagnostic.', in_repair_msg: 'Our technician is carefully repairing your vehicle. Everything is on schedule.', quality_check_msg: 'Your vehicle is in final quality control before release.', ready_for_pickup_msg: 'Great news: your vehicle is ready for pickup.', noData: 'No repair status found yet.', dateLabel: 'Date', time: 'Last update', meta: '{service} | {vehicle} | {dateLabel}: {date}' },
+      fr: { pageTitle: 'ACE Car Repair | Suivi en direct', backDashboard: 'Dashboard', websiteBtn: 'Site', title: 'Suivi de réparation', liveUpdateTitle: 'Mise à jour en direct', selectAppointment: 'Sélectionner un rendez-vous', no_appointment: 'Aucun rendez-vous planifié', no_appointment_msg: 'Aucun rendez-vous actif n est planifié pour le moment.', appointment_confirmed: 'Rendez-vous confirmé', diagnostic: 'Diagnostic', in_repair: 'En réparation', quality_check: 'Contrôle qualité', ready_for_pickup: 'Prêt pour retrait', appointment_confirmed_msg: 'Votre rendez-vous est confirmé. Nous sommes prêts à recevoir votre véhicule.', diagnostic_msg: 'Notre technicien effectue actuellement un diagnostic précis.', in_repair_msg: 'Notre technicien répare votre véhicule avec précision. Nous respectons les délais.', quality_check_msg: 'Votre véhicule est en contrôle qualité final avant remise.', ready_for_pickup_msg: 'Bonne nouvelle : votre véhicule est prêt pour le retrait.', noData: 'Aucun statut trouvé pour le moment.', dateLabel: 'Date', time: 'Dernière mise à jour', meta: '{service} | {vehicle} | {dateLabel}: {date}' }
     };
     let currentLang = localStorage.getItem('ace_lang') || 'nl';
     let pollTimer = null;
     let pollDelayMs = 30000;
     let pollFailures = 0;
     let dashboardContext = null;
+    let activeAppointments = [];
 
     const t = (key) => {
       const p = translations[currentLang] || {};
@@ -204,10 +215,10 @@
       const response = await fetch(portalApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'dashboard', token })
+        body: JSON.stringify({ action: 'tracker_context', token })
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok || data?.ok !== true) throw new Error(data?.error || 'Dashboard load failed');
+      if (!response.ok || data?.ok !== true) throw new Error(data?.error || 'Tracker load failed');
       return data;
     };
     const fetchRepairStatus = async (email, jobId) => {
@@ -222,13 +233,19 @@
 
     const stopPolling = () => { if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; } };
     const scheduleNextPoll = (run) => { stopPolling(); pollTimer = setTimeout(run, pollDelayMs); };
+    const mapAppointmentStatus = (raw) => {
+      const s = String(raw || '').toUpperCase();
+      if (s === 'COMPLETED') return 'ready_for_pickup';
+      if (s === 'PENDING' || s === 'CONFIRMED' || s === 'IN_PROGRESS') return 'appointment_confirmed';
+      return 'no_appointment';
+    };
     const startPolling = (email, jobId, fallbackStatus) => {
       const run = () => {
         if (document.hidden) { scheduleNextPoll(run); return; }
         fetchRepairStatus(email, jobId)
           .then((data) => {
             const normalized = String(data.currentStatus || fallbackStatus || 'no_appointment');
-            dashboardContext = { ...(dashboardContext || {}), status: normalized, timestamp: data.timestamp || '' };
+            dashboardContext = { ...(dashboardContext || {}), status: normalized, timestamp: data.timestamp || '', job_id: jobId, email };
             localStorage.setItem(trackerCacheKey, JSON.stringify(dashboardContext));
             renderTracker(normalized, data.timestamp || '');
             pollFailures = 0;
@@ -246,6 +263,40 @@
       stopPolling();
       run();
     };
+    const applySelection = (appointment) => {
+      if (!appointment) {
+        stopPolling();
+        statusMeta.textContent = '';
+        dashboardContext = { status: 'no_appointment', timestamp: '' };
+        renderTracker('no_appointment', '');
+        return;
+      }
+      const fallback = mapAppointmentStatus(appointment.status);
+      statusMeta.textContent = t('meta')
+        .replace('{service}', appointment.service || '-')
+        .replace('{vehicle}', appointment.vehicle || '-')
+        .replace('{dateLabel}', statusDateLabel())
+        .replace('{date}', appointment.preferred_date || '-');
+      dashboardContext = { status: fallback, timestamp: '', job_id: appointment.id || '', email: appointment.email || '' };
+      localStorage.setItem(trackerSelectionKey, String(appointment.id || ''));
+      renderTracker(fallback, '');
+      startPolling(appointment.email || '', appointment.id || '', fallback);
+    };
+    const renderAppointmentSelector = (items) => {
+      const list = Array.isArray(items) ? items : [];
+      activeAppointments = list;
+      if (list.length > 1) {
+        appointmentSelectorWrap.style.display = 'grid';
+        appointmentSelector.innerHTML = list.map((a) => `<option value="${String(a.id || '')}">${String(a.id || '-')} | ${String(a.preferred_date || '-')} | ${String(a.service || '-')} | ${String(a.status || '-')}</option>`).join('');
+        const savedId = localStorage.getItem(trackerSelectionKey) || '';
+        const selected = list.find((a) => String(a.id || '') === savedId) || list[0];
+        appointmentSelector.value = String(selected.id || '');
+        applySelection(selected);
+      } else {
+        appointmentSelectorWrap.style.display = 'none';
+        applySelection(list[0] || null);
+      }
+    };
 
     applyLanguage(currentLang);
     fetchI18n().then(() => { if (dashboardContext?.status) renderTracker(dashboardContext.status, dashboardContext.timestamp || ''); }).catch(() => {});
@@ -262,38 +313,32 @@
       renderTracker('no_appointment', '');
     }
 
-    fetchDashboard()
-      .then((dash) => {
-        const active = dash.active_car_status || null;
-        const mapAppointmentStatus = (raw) => {
-          const s = String(raw || '').toUpperCase();
-          if (s === 'COMPLETED') return 'ready_for_pickup';
-          if (s === 'PENDING' || s === 'CONFIRMED' || s === 'IN_PROGRESS') return 'appointment_confirmed';
-          return 'no_appointment';
-        };
-        const fallback = active ? mapAppointmentStatus(active.status) : 'no_appointment';
-        statusMeta.textContent = active ? t('meta')
-          .replace('{service}', active.service || '-')
-          .replace('{vehicle}', active.vehicle || '-')
-          .replace('{dateLabel}', statusDateLabel())
-          .replace('{date}', active.preferred_date || '-') : '';
-        if (!active) {
+    const refreshTrackerContext = () => {
+      fetchDashboard()
+        .then((dash) => {
+          const list = Array.isArray(dash.active_appointments)
+            ? dash.active_appointments
+            : [];
+          renderAppointmentSelector(list);
+        })
+        .catch(() => {
+          statusMeta.textContent = t('noData');
           dashboardContext = { status: 'no_appointment', timestamp: '' };
           renderTracker('no_appointment', '');
-          return;
-        }
-        dashboardContext = { status: fallback, timestamp: '' };
-        renderTracker(fallback, '');
-        startPolling(dash.user?.email || '', active?.id || '', fallback);
-      })
-      .catch(() => {
-        statusMeta.textContent = t('noData');
-        dashboardContext = { status: 'no_appointment', timestamp: '' };
-        renderTracker('no_appointment', '');
-      });
+        });
+    };
+    refreshTrackerContext();
+    appointmentSelector.addEventListener('change', () => {
+      const id = String(appointmentSelector.value || '');
+      const item = activeAppointments.find((a) => String(a.id || '') === id) || null;
+      applySelection(item);
+    });
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && dashboardContext) pollDelayMs = 2000;
+      if (!document.hidden && dashboardContext) {
+        pollDelayMs = 2000;
+        refreshTrackerContext();
+      }
     });
     window.addEventListener('beforeunload', stopPolling);
   </script>
